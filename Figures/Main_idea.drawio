@@ -1,0 +1,74 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.4">
+  <diagram name="Sida-1" id="tbfwsJwRf3N89RKaRYLh">
+    <mxGraphModel dx="864" dy="593" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="10" pageHeight="10" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="63JovV5LGpVXkthjlCoq-1" value="&lt;font face=&quot;Times New Roman&quot;&gt;Less vertical air dispersion due to inversion&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry y="10" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-2" value="&lt;font face=&quot;Times New Roman&quot;&gt;More&lt;/font&gt;&lt;span style=&quot;font-family: &amp;quot;Times New Roman&amp;quot;;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;font face=&quot;Times New Roman&quot;&gt;advection of aerosols&amp;nbsp;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="360" y="75" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-3" value="&lt;font face=&quot;Times New Roman&quot;&gt;Winds from the southeast&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="400" y="-10" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-4" value="&lt;font face=&quot;Times New Roman&quot;&gt;Higher emissions in central Europe&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="400" y="160" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-5" value="&lt;font face=&quot;Times New Roman&quot;&gt;Aerosol increase in southern Sweden during high-pressure blocking&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="180" y="67.5" width="150" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-10" value="&lt;font face=&quot;Times New Roman&quot;&gt;Local emissions&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry y="135" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-11" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" target="63JovV5LGpVXkthjlCoq-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="130" y="40" as="sourcePoint" />
+            <mxPoint x="170" y="-10" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="140" y="40" />
+              <mxPoint x="140" y="84" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-12" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="63JovV5LGpVXkthjlCoq-10" target="63JovV5LGpVXkthjlCoq-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="130" y="40" as="sourcePoint" />
+            <mxPoint x="250" y="68" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="140" y="160" />
+              <mxPoint x="140" y="116" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-13" value="" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="63JovV5LGpVXkthjlCoq-2" target="63JovV5LGpVXkthjlCoq-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="230" y="177" as="sourcePoint" />
+            <mxPoint x="350" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-14" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="63JovV5LGpVXkthjlCoq-3" target="63JovV5LGpVXkthjlCoq-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="90" as="sourcePoint" />
+            <mxPoint x="350" y="90" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="465" y="60" />
+              <mxPoint x="425" y="60" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="63JovV5LGpVXkthjlCoq-15" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="63JovV5LGpVXkthjlCoq-4" target="63JovV5LGpVXkthjlCoq-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="140" as="sourcePoint" />
+            <mxPoint x="460" y="175" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="465" y="140" />
+              <mxPoint x="425" y="140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -21,7 +21,7 @@ warnings.simplefilter("ignore", category=UserWarning)
 plt.close('all')
 
 info   = False          #<-------- CHANGE IF YOU WANT
-imsave = False         # Can be pdf, png, False
+imsave = "png"         # Can be pdf, png, False
 
 press_lim   = 1014   # This is the pressure limit for classifying high pressure
 dur_lim     = 5      # Minimum number of days for blocking

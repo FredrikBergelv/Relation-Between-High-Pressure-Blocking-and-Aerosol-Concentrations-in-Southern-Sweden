@@ -1,10 +1,10 @@
-# Bachelor Thesis: Analysis of PM₂.₅ Concentration During High-Pressure Blocking Events
+# Analysis of PM₂.₅ Concentration During High-Pressure Blocking Events
 
-This repository contains all scripts, data, and the LaTeX source code for my Bachelor thesis in physics. The work investigates the relationship between PM₂.₅ concentrations and high-pressure blocking events using data from the Swedish Meteorological and Hydrological Institute (SMHI) and air quality measurements from both urban and rural sites in Skåne County, Sweden.
+This repository contains all scripts and data, for my Bachelor thesis in physics, which now have been turned into an article. The work investigates the relationship between PM₂.₅ concentrations and high-pressure blocking events using data from the Swedish Meteorological and Hydrological Institute (SMHI) and air quality measurements from both urban and rural sites in Skåne County, Sweden.
 
 ---
 
-## Thesis Introduction
+## Article Introduction
 
 It is common knowledge that Earth’s increasing temperature has many side effects. One such effect is the increase in frequency of extreme weather phenomena. One such phenomenon, which lacks extensive research, is high-pressure blocking events. A high-pressure blocking event is an anticyclone that covers an area for a prolonged period of time and often blocks other types of weather, hence the name. This results in clearer weather and more extreme temperatures. However, an anticyclone is also associated with lower air movement and wind, causing the air to remain stagnant. This can lead to an accumulation of aerosols such as PM₂.₅ in the region.
 
@@ -14,7 +14,7 @@ To investigate the relationship between PM₂.₅ and high-pressure blocking, on
 
 ### Files
 
-- **BachelorThesis.tex**: LaTeX source file for the full written thesis.
+- **Figures**: A folder containg all the figures used in the article.
 - **compare_pressure.py**: Compares pressure data for different stations.
 - **csv_data.py**: Reads all CSV data files into pandas DataFrames.
 - **info_of_data.py**: Provides summaries and descriptive statistics of the data.
@@ -47,8 +47,7 @@ from collections import defaultdict
 
 ## Author
 
-Fredrik Bergelv  
-Bachelor Student, Lund University  
+Fredrik Bergelv, Lund University  
 [fredrik.bergelv@live.se](mailto:fredrik.bergelv@live.se)
 
 ## License

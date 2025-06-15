@@ -54,4 +54,4 @@ Fredrik Bergelv, Lund University
 
 If you use or reference the results of this work, please cite the following:
 
-**Bergelv, F. (2025).** . Analysis of PM₂.₅ Concentration During High-Pressure Blocking Events [Python code]. GitHub. https://github.com/FredrikBergelv/Relation-Between-High-Pressure-Blocking-and-Aerosol-Concentrations-in-Southern-Sweden
+**Bergelv, F. (2025).** Analysis of PM₂.₅ Concentration During High-Pressure Blocking Events [Python code]. GitHub. https://github.com/FredrikBergelv/Relation-Between-High-Pressure-Blocking-and-Aerosol-Concentrations-in-Southern-Sweden

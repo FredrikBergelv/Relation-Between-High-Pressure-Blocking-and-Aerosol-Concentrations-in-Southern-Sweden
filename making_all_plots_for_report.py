@@ -26,6 +26,7 @@ imsave = "png"         # Can be pdf, png, False
 press_lim   = 1014   # This is the pressure limit for classifying high pressure
 dur_lim     = 5      # Minimum number of days for blocking
 rain_lim    = 0.5    # Horly max rain rate
+daily_limit = 1      # Daily max rain rate (Ängelholm)
 mindatasets = 8      # Minimum allowed of dattsets allowed when taking std and mean
 daystoplot  = 14     # How long periods should the plots display
 pm_coverege = 0.85   # How much PM2.5 coverge must the periods have
@@ -45,7 +46,7 @@ blocking_list = read.find_blocking(csv.histogram_main['pressure'],
                                    csv.histogram_main['rain'], 
                                    pressure_limit=press_lim, 
                                    duration_limit=dur_lim, 
-                                   rain_limit=2/24) # This is avrege four 24 hours 
+                                   rain_limit=daily_limit/24) # This is avrege four 24 hours 
 
 
 read.plot_blockings_by_year(blocking_list, lim1=7, lim2=10, save=imsave)

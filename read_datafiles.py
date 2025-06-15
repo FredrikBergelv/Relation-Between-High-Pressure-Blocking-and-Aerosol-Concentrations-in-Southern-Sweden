@@ -2640,7 +2640,7 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
             
             # Check if p-value is below 0.05 and format the string accordingly
             if p_value < 0.05:
-                infostrings[season] = f"p={p_value:.1e}, $\\tau$={tau}, sen-slope={slope:.1e}"
+                infostrings[season] = f"p={p_value:.1e}, $\\tau$={tau:.2f}, sen-slope={slope:.1e}"
             else:
                 infostrings[season] = f"p={p_value:.3f} $\\nless$ 0.05"
                                                                                       
@@ -2831,10 +2831,10 @@ def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
         fig, ax = plt.subplots(figsize=(9*scalar, 5*scalar))
 
         # Line plots for total blockings and long blockings
-        ax.plot(t, total_blockings, label=f'Total Blockings, p={ptot:.1e}, $\\tau$={tautot}, sen-slope={slopetot:.1e}', color='black', linestyle='-', marker='s', alpha=0.9)
+        ax.plot(t, total_blockings, label=f'Total Blockings, p={ptot:.1e}, $\\tau$={tautot:.2f}, sen-slope={slopetot:.1e}', color='black', linestyle='-', marker='s', alpha=0.9)
         
-        ax.plot(t, lim1_blockings_per_year, label=f'Blockings > {lim1} Days, p={p1:.1e}, $\\tau$={tau1}, sen-slope={slope1:.1e}', color='green', linestyle='-', marker='o', alpha=0.9)
-        ax.plot(t, lim2_blockings_per_year, label=f'Blockings > {lim2} Days, p={p2:.1e}, $\\tau$={tau2}, sen-slope={slope2:.1e}', color='red', linestyle='-', marker='^', alpha=0.9)
+        ax.plot(t, lim1_blockings_per_year, label=f'Blockings > {lim1} Days, p={p1:.1e}, $\\tau$={tau1:.2f}, sen-slope={slope1:.1e}', color='green', linestyle='-', marker='o', alpha=0.9)
+        ax.plot(t, lim2_blockings_per_year, label=f'Blockings > {lim2} Days, p={p2:.1e}, $\\tau$={tau2:.2f}, sen-slope={slope2:.1e}', color='red', linestyle='-', marker='^', alpha=0.9)
         # Labels and title
         ax.set_xlabel('Year', fontsize=12)
         ax.set_ylabel('Number of events', fontsize=12)

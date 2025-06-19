@@ -364,77 +364,98 @@ The functions are for extracting the blocking period from pressure data
 and rain data. 
 """
 def find_blocking(pres_data, rain_data, pressure_limit, duration_limit, 
-                            rain_limit, plot=False, info=False):
+                  rain_limit, period_rain_limit, plot=False, info=False):
     """
-    This function takes a pandas datafile as argument and gives you the periods of blocking, 
-    taking rainfall data into account (only hours with rainfall under the limit are included).
-    If one wants to, the blocking data for each period can be plotted.
+    Identifies high pressure blocking periods from merged pressure and rain data.
+    Filters out blocks where total rain exceeds period_rain_limit.
+    Optionally plots each block.
     """
-    # WE MERGE THE DATASETS
+    # Align datasets to common date range
     start_date = max(min(pres_data['datetime']), min(rain_data['datetime']))
     end_date = min(max(pres_data['datetime']), max(rain_data['datetime']))
     
     pres_data = pres_data[(pres_data['datetime'] >= start_date) & (pres_data['datetime'] <= end_date)]
     rain_data = rain_data[(rain_data['datetime'] >= start_date) & (rain_data['datetime'] <= end_date)]
     
-    # Sort both datasets by datetime
     pres_data = pres_data.sort_values('datetime')
     rain_data = rain_data.sort_values('datetime')
     
-    # Merge dataframes using merge_asof
+    # Merge pressure and rainfall data
     data = pd.merge_asof(pres_data, rain_data, on='datetime', direction='nearest')
+
+    # Remove rows where rain is missing
+    data = data.dropna(subset=['rain'])
     
-    # Drop empty rows
-    data.dropna(subset=['rain'])
+    # Identify high pressure & low rain hours
+    data['highp'] = (data['pressure'] > pressure_limit) & (data['rain'] < rain_limit)
     
-    # Identify where we have high pressure and no rain, add new column
-    data['highp'] = (data['pressure'] > pressure_limit) & (data['rain'] < rain_limit) 
-    
-    # Identify if next value is not high pressure or not (shift)(data['rain'] < rain_limit) 
-    # If the next value is not the same, add the value of True(1) cumulative 
-    # This gives a unique streak_id for each streak depending on the limit
+    # Assign streak IDs to contiguous high pressure periods
     data['streak_id'] = (data['highp'] != data['highp'].shift()).cumsum()
     
-    # Group by streak_id and calculate the duration of each streak
+    # Group by streak to find duration and mark valid blocking periods
     streaks = data.groupby('streak_id').agg(
-        start_date = ('datetime', 'first'),  # start is the first datetime in each id
-        end_date = ('datetime', 'last'),     # end is the last datetime in each id
-        duration_hours = ('datetime', lambda date: (date.max() - date.min()).total_seconds()/3600 + 1), # Calculate the duration, in hours
-        highp = ('highp', 'max')             # Since all highp first/max, all give the same
+        start_date=('datetime', 'first'),
+        end_date=('datetime', 'last'),
+        duration_hours=('datetime', lambda d: (d.max() - d.min()).total_seconds() / 3600 + 1),
+        highp=('highp', 'max')
     )
-    # Filter for streaks with high pressure lasting at least the right number of days
-    # We aslo filter the streaks which are over 100 days, due to problems whith combining data
-    blocking = streaks[(streaks['highp'] == True) & (streaks['duration_hours']/24 >= duration_limit) & (streaks['duration_hours']/24 < 100)]
-    blocking = blocking.drop(columns=['highp'])
     
-    datalist = []  # We want to return a list of all the high pressure periods
+    # Select valid blocking streaks
+    blocking = streaks[
+        (streaks['highp'] == True) &
+        (streaks['duration_hours'] / 24 >= duration_limit) &
+        (streaks['duration_hours'] / 24 < 100)
+    ].drop(columns=['highp'])
+
+    datalist = []
+
     for index, row in blocking.iterrows():
-        start_date, end_date = row['start_date'], row['end_date']  # Extract the datetime
-        # Filter the data for this specific streak 
+        start_date, end_date = row['start_date'], row['end_date']
         streak_data = data[(data['datetime'] >= start_date) & (data['datetime'] <= end_date)]
-        streak_data = streak_data.drop(columns=['highp', 'streak_id', "rain"])
 
-        # Plot the streak if plot is True
-        if plot:
-            if len(blocking) > 50:
-                raise ValueError(f"Showing {len(blocking)} graphs is too many!")
-            plt.figure(figsize=(10, 6))
-            plt.plot(streak_data['datetime'], streak_data['pressure'], label='Pressure')
-            plt.xlabel('Date and Time')
-            plt.ylabel('Pressure [hPa]')
-            plt.title(f'High Pressure blocking ({start_date} to {end_date})')
-            plt.xticks(rotation=45)
-            plt.grid(True, axis='both', linestyle='--', alpha=0.6)
+        # Compute total rain before dropping the column
+        total_rain = streak_data["rain"].sum()
+        if total_rain < period_rain_limit or pd.isna(total_rain):
+            if plot:
+                if len(blocking) > 50:
+                    raise ValueError(f"Showing {len(blocking)} graphs is too many!")
+                plt.figure(figsize=(10, 6))
+                plt.plot(streak_data['datetime'], streak_data['pressure'], label='Pressure')
+                plt.xlabel('Date and Time')
+                plt.ylabel('Pressure [hPa]')
+                plt.title(f'High Pressure blocking ({start_date} to {end_date})')
+                plt.xticks(rotation=45)
+                plt.grid(True, axis='both', linestyle='--', alpha=0.6)
+                plt.tight_layout()
+                plt.legend()
+                plt.show()
 
-            plt.tight_layout()
-            plt.legend()
-            plt.show()
-        datalist.append(streak_data)
-    
+            # Drop helper columns only after filtering
+            streak_data = streak_data.drop(columns=['highp', 'streak_id', 'rain'])
+            datalist.append(streak_data)
+
     if info:
         print(f'A total of {len(datalist)} high pressure blocking events were found between {min(data["datetime"].dt.date)} and {max(data["datetime"].dt.date)}')
-        
-    return datalist  # Return a list of all the blocking data
+
+    return datalist
+
+
+def second_rainfilter(totdata_list1, totdata_list_dates, period_limit=5):
+    """ 
+    This function filters the totdata_lists for period rain.
+    Keeps events where total rain is < period_limit or is NaN.
+    """
+    filtered_list = []
+    filtered_list_dates = []
+
+    for i, event in enumerate(totdata_list1):
+        event_rain = sum(float(event[5][h]) for h in range(len(event.T)))
+        if event_rain < period_limit or np.isnan(event_rain):
+            filtered_list.append(event)
+            filtered_list_dates.append(totdata_list_dates[i])
+        else:
+            print(totdata_list_dates[i])
+    return filtered_list, filtered_list_dates
 
 """
 This function takes two blcoking lists and sorts them so the blokings line up 
@@ -1130,21 +1151,21 @@ def sort_season(totdata_list, totdata_list_dates, pie=False, save=False,
         if uppermonthlim is not False and lowermonthlim is not False:
             if month >= lowermonthlim and month <= uppermonthlim:
                 personalized_totdata_list.append(array)
+                
+    lenWinter = len(winter_totdata_list) 
+    lenSpring = len(spring_totdata_list)
+    lenSummer = len(summer_totdata_list)
+    lenAutumn = len(autumn_totdata_list)
+    
+    totlen = lenWinter + lenSpring + lenSummer + lenAutumn 
+    
+    partWinter = (lenWinter) / totlen
+    partSpring= (lenSpring) / totlen
+    partSummer = (lenSummer) / totlen
+    partAutumn = (lenAutumn) / totlen
             
     # Pie Chart Visualization
-    if pie:
-        lenWinter = len(winter_totdata_list) 
-        lenSpring = len(spring_totdata_list)
-        lenSummer = len(summer_totdata_list)
-        lenAutumn = len(autumn_totdata_list)
-        
-        totlen = lenWinter + lenSpring + lenSummer + lenAutumn 
-        
-        partWinter = (lenWinter) / totlen
-        partSpring= (lenSpring) / totlen
-        partSummer = (lenSummer) / totlen
-        partAutumn = (lenAutumn) / totlen
-        
+    if pie:        
         # Prepare data for the pie chart
         sizes = [partWinter, partSpring, partSummer, partAutumn]
         labels = ["Winter", "Spring", "Summer", "Autumn"]
@@ -1448,27 +1469,27 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     t_after = np.arange(hours_after) / 24
     
 
-    ax1.plot(t_after, mean_after1, label=f'{place1}', c='C2')
+    ax1.plot(t_after, mean_after1, label=f'{place1}', c='C1')
     ax1.plot(t_after, pm_mean1 + t_after * 0, label='Mean during no blocking', c='gray')
     ax1.fill_between(t_after, pm_mean1 + t_after * 0 + pm_sigma1, pm_mean1 + t_after * 0 - pm_sigma1, alpha=0.4, color='gray') 
-    ax1.fill_between(t_after, mean_after1 + sigma_after1, mean_after1 - sigma_after1, alpha=0.4, color='C2')
+    ax1.fill_between(t_after, mean_after1 + sigma_after1, mean_after1 - sigma_after1, alpha=0.4, color='C1')
     ax1.plot(t_after, t_after * 0 + 25, label='EU annual mean limit', c='r', linestyle='--')
     ax1.set_xlabel('Time from end of blocking [days]')
     ax1.set_ylabel('PM2.5 [µg/m³]')
     ax1.set_ylim(0, 35)
     ax1.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax1.legend()
+    ax1.legend(loc='upper left')
     
-    ax2.plot(t_after, mean_after2, label=f'{place2}', c='C2')
+    ax2.plot(t_after, mean_after2, label=f'{place2}', c='C1')
     ax2.plot(t_after, pm_mean2 + t_after * 0, c='gray')
     ax2.fill_between(t_after, pm_mean2 + t_after * 0 + pm_sigma2, pm_mean2 + t_after * 0 - pm_sigma2, alpha=0.4, color='gray') 
-    ax2.fill_between(t_after, mean_after2 + sigma_after2, mean_after2 - sigma_after2, alpha=0.4, color='C2')
+    ax2.fill_between(t_after, mean_after2 + sigma_after2, mean_after2 - sigma_after2, alpha=0.4, color='C1')
     ax2.plot(t_after, t_after * 0 + 25, c='r', linestyle='--')
     ax2.set_xlabel('Time from end of blocking [days]')
     ax2.set_ylabel('PM2.5 [µg/m³]')
     ax2.set_ylim(0, 35)
     ax2.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax2.legend()
+    ax2.legend(loc='upper left')
     
     ax1.set_xlim(0,daystoplot)
     ax2.set_xlim(0,daystoplot)
@@ -2831,10 +2852,13 @@ def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
         fig, ax = plt.subplots(figsize=(9*scalar, 5*scalar))
 
         # Line plots for total blockings and long blockings
-        ax.plot(t, total_blockings, label=f'Total Blockings, p={ptot:.1e}, $\\tau$={tautot:.2f}, sen-slope={slopetot:.1e}', color='black', linestyle='-', marker='s', alpha=0.9)
+        ax.plot(t, total_blockings, label=f'Total Blockings, p={ptot:.1e}, $\\tau$={tautot:.2f}, sen-slope={slopetot:.1e}', color='black', linestyle='-', 
+                marker='s', markersize=5, alpha=0.9)
         
-        ax.plot(t, lim1_blockings_per_year, label=f'Blockings > {lim1} Days, p={p1:.1e}, $\\tau$={tau1:.2f}, sen-slope={slope1:.1e}', color='green', linestyle='-', marker='o', alpha=0.9)
-        ax.plot(t, lim2_blockings_per_year, label=f'Blockings > {lim2} Days, p={p2:.1e}, $\\tau$={tau2:.2f}, sen-slope={slope2:.1e}', color='red', linestyle='-', marker='^', alpha=0.9)
+        ax.plot(t, lim1_blockings_per_year, label=f'Blockings > {lim1} Days, p={p1:.1e}, $\\tau$={tau1:.2f}, sen-slope={slope1:.1e}', color='green', linestyle='-', 
+                marker='o', markersize=5, alpha=0.9)
+        ax.plot(t, lim2_blockings_per_year, label=f'Blockings > {lim2} Days, p={p2:.1e}, $\\tau$={tau2:.2f}, sen-slope={slope2:.1e}', color='red', linestyle='-', 
+                marker='^', markersize=5, alpha=0.9)
         # Labels and title
         ax.set_xlabel('Year', fontsize=12)
         ax.set_ylabel('Number of events', fontsize=12)

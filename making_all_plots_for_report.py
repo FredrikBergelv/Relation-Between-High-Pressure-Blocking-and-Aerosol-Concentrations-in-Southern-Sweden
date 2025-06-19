@@ -26,11 +26,12 @@ imsave = "png"         # Can be pdf, png, False
 press_lim   = 1014   # This is the pressure limit for classifying high pressure
 dur_lim     = 5      # Minimum number of days for blocking
 rain_lim    = 0.5    # Horly max rain rate
+event_limit = 5      # Second rain filter for entire rain period
 daily_limit = 1      # Daily max rain rate (Ängelholm)
 mindatasets = 8      # Minimum allowed of dattsets allowed when taking std and mean
 daystoplot  = 14     # How long periods should the plots display
 pm_coverege = 0.85   # How much PM2.5 coverge must the periods have
-timediff    = '5 hours' # This determines how far away two differnet blocking can be 
+timediff    = '5 hours' # This determines how far away two differnet events can be 
 
 
 start_time = time.time()
@@ -46,7 +47,8 @@ blocking_list = read.find_blocking(csv.histogram_main['pressure'],
                                    csv.histogram_main['rain'], 
                                    pressure_limit=press_lim, 
                                    duration_limit=dur_lim, 
-                                   rain_limit=daily_limit/24) # This is avrege four 24 hours 
+                                   rain_limit=daily_limit/24,
+                                   period_rain_limit=event_limit) # This is avrege four 24 hours 
 
 
 read.plot_blockings_by_year(blocking_list, lim1=7, lim2=10, save=imsave)
@@ -73,13 +75,13 @@ PM_data_Vavihill   = csv.main['PM25']['Vavihill']
 rain_data_Vavihill = csv.main['rain']["Hörby"]
 wind_data_Vavihill = csv.main['wind']["Hörby"]
          
-if info: print("*** Vavihill *** ")
 
 
 blocking_list_Vavihill = read.find_blocking(pressure_data, rain_data_Vavihill, 
                                        pressure_limit=press_lim, 
                                        duration_limit=dur_lim, 
                                        rain_limit=rain_lim,
+                                       period_rain_limit=event_limit,
                                        info=info)
 
 
@@ -91,6 +93,7 @@ blocking_list_Malmö = read.find_blocking(pressure_data, rain_data_Malmö,
                                        pressure_limit=press_lim, 
                                        duration_limit=dur_lim, 
                                        rain_limit=rain_lim,
+                                       period_rain_limit=event_limit,
                                        info=info)
 
 
@@ -135,6 +138,7 @@ totdata_list_Vavihill, totdata_list_dates_Vavihill = read.array_blocking_list(
                                                   cover=pm_coverege, 
                                                   info=info)
 
+
 block_datafile_Vavihill = pd.concat(blocking_list_Vavihill, ignore_index=True)
 PM_without_blocking_Vavihill = PM_data_Vavihill[~PM_data_Vavihill['datetime_start'].isin(block_datafile_Vavihill['datetime'])]
 
@@ -153,6 +157,7 @@ totdata_list_Malmö, totdata_list_dates_Malmö = read.array_blocking_list(
                                                   blocking_list_Malmö, 
                                                   cover=pm_coverege, 
                                                   info=info)
+
     
 
 block_datafile_Malmö = pd.concat(blocking_list_Malmö, ignore_index=True)
@@ -249,4 +254,5 @@ if not info: print('3. The mean plots are now done')
 if imsave: plt.close('all')
     
 if not info: print(f"Elapsed time: {time.time() - start_time:.0f} seconds")
+
 

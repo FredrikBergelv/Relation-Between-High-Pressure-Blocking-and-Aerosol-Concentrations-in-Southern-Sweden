@@ -44,18 +44,18 @@ Here we make the frequency plots
 """
 
 blocking_list = read.find_blocking(csv.histogram_main['pressure'], 
-                                   csv.histogram_main['rain'], 
+                                   csv.histogram_main['rain'],
                                    pressure_limit=press_lim, 
                                    duration_limit=dur_lim, 
                                    rain_limit=daily_limit/24,
-                                   period_rain_limit=event_limit) # This is avrege four 24 hours 
+                                   period_rain_limit=event_limit,
+                                   wind_data=csv.histogram_main['wind']) # This is avrege four 24 hours 
 
 
 read.plot_blockings_by_year(blocking_list, lim1=7, lim2=10, save=imsave)
 
 
-read.plot_blockingsdays_by_year(blocking_list, typ="all", save=imsave)
-
+read.plot_blockingsdays_by_year(blocking_list, save=imsave)
 
 
 if not info: print('1. The frequency plots are done')

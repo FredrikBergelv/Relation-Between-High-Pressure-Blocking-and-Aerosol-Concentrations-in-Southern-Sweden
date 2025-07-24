@@ -6,7 +6,15 @@ Created on Tue Jun 17 14:40:57 2025
 @author: fredrik
 """
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np 
+import read_datafiles as read
+import csv_data as csv
+import time
+import warnings
 
+from making_all_plots_for_report import totdata_list_Malmö, totdata_list_Vavihill
 
 def what_is_daily_rainfal(totdata_list1, totdata_list2=False,
                           how_many_over=False, how_many_over2=False, 
@@ -145,3 +153,7 @@ def what_is_blocking_rainfal(totdata_list1, totdata_list2=False,
     return blocking_rain_list_rounded # Return list of 24h rainfall. 
     
 
+
+what_is_daily_rainfal(totdata_list_Malmö, totdata_list_Vavihill,
+                          how_many_over=1, how_many_over2=2, 
+                          how_many_over3=3, info=True)

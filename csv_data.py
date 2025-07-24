@@ -29,7 +29,8 @@ data = {
         "Helsingborg": "csv_files/Helsingborg_wind.csv",
         "Malmö": "csv_files/Malmö_wind.csv",
         "Hörby": "csv_files/Hörby_wind.csv",
-        "Sturup": "csv_files/Sturup_wind.csv"
+        "Sturup": "csv_files/Sturup_wind.csv",
+        "Ängelholm": "csv_files/Ängelholm_wind.csv"
     },
     "rain": {
         "Helsingborg": "csv_files/Helsingborg_rain.csv",
@@ -93,6 +94,8 @@ Malmö_rain_data = read.get_rain_data(data["rain"]["Malmö"])
 # Read Wind & Temperature Data
 Hörby_wind_data = read.get_wind_data(data["wind"]["Hörby"])
 Malmö_wind_data = read.get_wind_data(data["wind"]["Malmö"])
+Ängelholm_wind_data = read.get_wind_data(data["wind"]["Ängelholm"])
+
 
 
 temp_data = read.get_temp_data(data["temperature"]["Hörby"])
@@ -110,5 +113,6 @@ main = {
 
 histogram_main = {
     "pressure": pres_data,
-    "rain": rain_data}
+    "rain": rain_data,
+    "wind": Ängelholm_wind_data}
 

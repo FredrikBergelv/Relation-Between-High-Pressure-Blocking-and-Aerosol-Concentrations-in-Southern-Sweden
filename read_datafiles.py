@@ -363,8 +363,11 @@ def yearly_histogram(data, datatype, location=False, save=False):
 The functions are for extracting the blocking period from pressure data
 and rain data. 
 """
+
+
 def find_blocking(pres_data, rain_data, pressure_limit, duration_limit, 
-                  rain_limit, period_rain_limit, plot=False, info=False):
+                  rain_limit, period_rain_limit, plot=False, info=False,
+                  wind_data=False):
     """
     Identifies high pressure blocking periods from merged pressure and rain data.
     Filters out blocks where total rain exceeds period_rain_limit.
@@ -382,6 +385,19 @@ def find_blocking(pres_data, rain_data, pressure_limit, duration_limit,
     
     # Merge pressure and rainfall data
     data = pd.merge_asof(pres_data, rain_data, on='datetime', direction='nearest')
+
+    # If we want we can include wind data
+    if isinstance(wind_data, pd.DataFrame) and not wind_data.empty:
+        wind_data = wind_data[(wind_data['datetime'] >= start_date) & (wind_data['datetime'] <= end_date)]
+        wind_data = wind_data.sort_values('datetime')
+
+        # Set dir < 1 and speed == 0 to NaN
+        wind_data.loc[wind_data['dir'] < 1, 'dir'] = np.nan
+        wind_data=wind_data.drop(columns=['speed'])
+
+        # Merge into main dataset
+        data = pd.merge_asof(data, wind_data, on='datetime', direction='nearest')
+
 
     # Remove rows where rain is missing
     data = data.dropna(subset=['rain'])
@@ -432,6 +448,7 @@ def find_blocking(pres_data, rain_data, pressure_limit, duration_limit,
 
             # Drop helper columns only after filtering
             streak_data = streak_data.drop(columns=['highp', 'streak_id', 'rain'])
+
             datalist.append(streak_data)
 
     if info:
@@ -1712,7 +1729,6 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
         
     plt.show() 
     
-
 def sigma_dir_mean(blocking_list1, PM_data1, wind_data1, sort=0.5):
     """
     Calculates the mean and standard deviation (sigma) of PM2.5 concentrations
@@ -1760,11 +1776,10 @@ def sigma_dir_mean(blocking_list1, PM_data1, wind_data1, sort=0.5):
 
     return results
 
-
 def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot, 
                   no_blocking_data1, no_blocking_data2,
                   minpoints=8, place1='', place2='', save=False, info=False,
-                  labels=["NE (310° to 70°)", "SE (70° to 190°)", "W (190° to 310°)", "No Specific"]):
+                  labels=["NE (310° to 70°)", "SE (70° to 190°)", "W (190° to 310°)", "Mixed"]):
     
     """
     This function takes the mean of the PM2.5 concentration for each hour 
@@ -2480,6 +2495,8 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
             years.append(year)  # Add the year to the list if it's unique
     
     # Make a dictionary with years as keys and values [0, 0, 0, 0] (for winter, spring, summer, autumn)
+    blocking_wind = {year: [0, 0, 0, 0] for year in years} 
+    
     blocking_seasonal = {year: [0, 0, 0, 0] for year in years} 
         
     blocking_strength = {year: [0, 0, 0] for year in years} 
@@ -2882,3 +2899,307 @@ def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
     plt.show()
 
 
+
+def plot_blockingsdays_by_year(block_list, save=False):
+    """We want to show the number of blockings per year"""
+    
+    # Firstly we stich together the block list wind the rain data
+    
+    years = [] 
+    
+    # Make a loop to find all the relevant years
+    for data in block_list:
+        start, end = min(data['datetime']), max(data['datetime'])
+        
+        # Find the mean date and extract the year
+        year = (start + (end - start) / 2).year
+        
+        if year not in years:
+            years.append(year)  # Add the year to the list if it's unique
+    
+    # Make a dictionary with years as keys and values [0, 0, 0, 0] (for winter, spring, summer, autumn)
+    blocking_wind = {year: [0, 0, 0, 0] for year in years} 
+    
+    blocking_seasonal = {year: [0, 0, 0, 0] for year in years} 
+        
+    blocking_strength = {year: [0, 0, 0] for year in years} 
+        
+    for data in block_list:
+        start, end = min(data['datetime']), max(data['datetime'])
+        duration = (end - start).days
+        
+        # Extract the mean pressure 
+        mean_pressure = np.mean(data["pressure"])            
+        # Find the date and month
+        date = (start + (end - start) / 2)
+        month = date.month
+        year = date.year
+        
+        # Add to the winter or summer blocking duration
+        if month in [12, 1, 2]:
+            blocking_seasonal[year][0] += duration  # Winter
+        elif month in [3, 4, 5]:
+            blocking_seasonal[year][1] += duration  # Spring
+        elif month in [6, 7, 8]:
+            blocking_seasonal[year][2] += duration  # Summer
+        elif month in [9, 10, 11]:
+            blocking_seasonal[year][3] += duration  # Autumn
+            
+        if mean_pressure < 1020:
+            blocking_strength[year][0] += duration  # weak
+        elif mean_pressure < 1025 and mean_pressure > 1020:
+            blocking_strength[year][1] += duration  # medium
+        elif mean_pressure > 1025:
+            blocking_strength[year][2] += duration  # strong   
+            
+        # Wind direction
+        if 'dir' in data.columns:
+            directions = data['dir'].dropna()
+            total = len(directions)
+
+            if total == 0:
+                blocking_wind[year][3] += duration  # s
+                continue
+
+            ne_count = ((directions >= 310) | (directions <= 70)).sum()
+            se_count = ((directions > 70) & (directions <= 190)).sum()
+            w_count  = ((directions > 190) & (directions < 310)).sum()
+
+            ne_frac = ne_count / total
+            se_frac = se_count / total
+            w_frac  = w_count  / total
+
+            if ne_frac >= 0.5:
+                blocking_wind[year][0] += duration
+            elif se_frac >= 0.5:
+                blocking_wind[year][1] += duration
+            elif w_frac >= 0.5:
+                blocking_wind[year][2] += duration
+            else:
+                blocking_wind[year][3] += duration  # Non-directional
+
+        
+    # Remove the first and last years since they are not full years
+    blocking_seasonal.pop(min(blocking_seasonal))  # Remove the first year
+    blocking_seasonal.pop(max(blocking_seasonal))  # Remove the last year
+    
+    blocking_strength.pop(min(blocking_strength))  # Remove the first year
+    blocking_strength.pop(max(blocking_strength))  # Remove the last year
+    
+    blocking_wind.pop(min(blocking_wind))  # Remove the first year
+    blocking_wind.pop(max(blocking_wind))  # Remove the last year
+    
+    # Extract the data as lists
+    winter = [values[0] for values in blocking_seasonal.values()]  # Winter blocking
+    spring = [values[1] for values in blocking_seasonal.values()]  # Spring blocking
+    summer = [values[2] for values in blocking_seasonal.values()]  # Summer blocking
+    autumn = [values[3] for values in blocking_seasonal.values()]  # Autumn blocking
+    
+    weak = [values[0] for values in blocking_strength.values()]  # weak blocking
+    medium = [values[1] for values in blocking_strength.values()]  # medium blocking
+    strong = [values[2] for values in blocking_strength.values()]  # strong blocking
+    
+    NE = [values[0] for values in blocking_wind.values()]  # NE
+    SE = [values[1] for values in blocking_wind.values()]  # SE
+    W = [values[2] for values in blocking_wind.values()]  # W
+    Non = [values[3] for values in blocking_wind.values()]  # Non specific
+
+    
+    total = [values[0] + values[1] + values[2] + values[3] for values in blocking_seasonal.values()]  # Total blocking days
+    
+    years = list(blocking_seasonal.keys())  # Years list
+   
+    # Create a figure
+    fig = plt.figure(figsize=(9, 10))
+
+    # Create a GridSpec for the layout
+    gs = gridspec.GridSpec(5, 3, height_ratios=[1, 1, 1, 1, 1.7], hspace=0.5, wspace=0.15)
+
+    # Add subplots to the grid
+    
+    ax12 = fig.add_subplot(gs[3, 0])  
+    ax9 =  fig.add_subplot(gs[0, 0], sharex=ax12)  
+    ax10 = fig.add_subplot(gs[1, 0], sharex=ax12)  
+    ax11 = fig.add_subplot(gs[2, 0], sharex=ax12)  
+
+    ax4 = fig.add_subplot(gs[3, 1], sharey=ax12)
+    ax1 = fig.add_subplot(gs[0, 1], sharex=ax4, sharey=ax9)  
+    ax2 = fig.add_subplot(gs[1, 1], sharex=ax4, sharey=ax10)  
+    ax3 = fig.add_subplot(gs[2, 1], sharex=ax4, sharey=ax11)  
+        
+    ax7 = fig.add_subplot(gs[2, 2], sharey=ax11)
+    ax5 = fig.add_subplot(gs[0, 2], sharex=ax7, sharey=ax9)  
+    ax6 = fig.add_subplot(gs[1, 2], sharex=ax7, sharey=ax10)  
+    
+    
+    ax8 = fig.add_subplot(gs[4, :])  
+
+        
+    # Add subplot labels (a), (b), (c), (d)
+    ax1.text(0.95, 0.95, "(e)", transform=ax1.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax2.text(0.95, 0.95, "(f)", transform=ax2.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax3.text(0.95, 0.95, "(g)", transform=ax3.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax4.text(0.95, 0.95, "(h)", transform=ax4.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    
+    ax5.text(0.95, 0.95, "(i)", transform=ax5.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax6.text(0.95, 0.95, "(j)", transform=ax6.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax7.text(0.95, 0.95, "(k)", transform=ax7.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    
+    ax9.text(0.95, 0.95, "(a)", transform=ax9.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax10.text(0.95, 0.95, "(b)", transform=ax10.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax11.text(0.95, 0.95, "(c)", transform=ax11.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax12.text(0.95, 0.95, "(d)", transform=ax12.transAxes, fontsize=12, fontname='serif', ha='right', va='top')    
+    
+    ax8.text(0.95, 0.95, "(l)", transform=ax8.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+        
+        
+    labels = ["NE", "SE", "W", "Non", 
+              "winter", "spring", "summer", "autumn", 
+              "strong", "weak", "medium", 
+              "total"]
+    infostrings = {}
+        
+    for label in labels:
+            # Get the p-value, tau, and slope for each season
+            p_value = mk.original_test(eval(label), 0.05)[2]
+            tau = mk.original_test(eval(label), 0.05)[4]
+            slope = mk.original_test(eval(label), 0.05)[7]
+            
+            # Check if p-value is below 0.05 and format the string accordingly
+            if p_value < 0.05:
+                infostrings[label] = f"p={p_value:.1e}, $\\tau$={tau:.2f}, \n sen-slope={slope:.1e}"
+            else:
+                infostrings[label] = f"p={p_value:.3f} $\\nless$ 0.05"
+                                                                                      
+
+    # Plot the data for the first set of plots (seasons)
+    ax1.plot(years, winter, label=infostrings["winter"], color='b', linestyle='-', marker='s', markersize=3)
+    ax1.set_title("Winter")
+    ax1.grid(True, axis='both', linestyle='--', alpha=0.6)
+        
+    ax2.plot(years, spring, label=infostrings["spring"], color='g', linestyle='-', marker='s', markersize=3)
+    ax2.set_title("Spring")
+    ax2.grid(True, axis='both', linestyle='--', alpha=0.6)
+    
+    ax3.plot(years, summer, label=infostrings["summer"], color='r', linestyle='-', marker='s', markersize=3)
+    ax3.set_title("Summer")
+    ax3.grid(True, axis='both', linestyle='--', alpha=0.6)
+
+    ax4.plot(years, autumn, label=infostrings["autumn"], color='gold', linestyle='-', marker='s', markersize=3)
+    ax4.set_title("Autumn")
+    ax4.set_xlabel("Year")
+    ax4.set_xticks(years[::17])  # Show every tenth year on the x-axis
+    ax4.grid(True, axis='both', linestyle='--', alpha=0.6)
+
+    # Plot the data for the second set of plots (strength)
+    ax5.plot(years, weak, label=infostrings["weak"], color='b', linestyle='-', marker='s', markersize=3)
+    ax5.set_title("Weak")
+    ax5.grid(True, axis='both', linestyle='--', alpha=0.6)
+
+    ax6.plot(years, medium, label=infostrings["medium"], color='g', linestyle='-', marker='s', markersize=3)
+    ax6.set_title("Medium")
+    ax6.grid(True, axis='both', linestyle='--', alpha=0.6)
+
+    ax7.plot(years, strong, label=infostrings["strong"], color='r', linestyle='-', marker='s', markersize=3)
+    ax7.set_title("Strong")
+    ax7.set_xlabel("Year")
+    ax7.set_xticks(years[::17])  # Show every tenth year on the x-axis
+    ax7.grid(True, axis='both', linestyle='--', alpha=0.6)
+    
+    # Plot the data for the second set of plots (strength)
+    ax9.plot(years, NE, label=infostrings["NE"], color='b', linestyle='-', marker='s', markersize=3)
+    ax9.set_title("NE (310° to 70°)")
+    ax9.set_ylabel("Days")
+    ax9.grid(True, axis='both', linestyle='--', alpha=0.6)
+    ax9.set_yticks(np.arange(0, max(weak), 20))
+
+    ax10.plot(years, SE, label=infostrings["SE"], color='g', linestyle='-', marker='s', markersize=3)
+    ax10.set_title("SE (70° to 190°)")
+    ax10.set_ylabel("Days")
+    ax10.grid(True, axis='both', linestyle='--', alpha=0.6)
+    ax10.set_yticks(np.arange(0, max(medium), 20))
+
+    ax11.plot(years, W, label=infostrings["W"], color='r', linestyle='-', marker='s', markersize=3)
+    ax11.set_title("W (190° to 310°)")
+    ax11.set_ylabel("Days")
+    ax11.grid(True, axis='both', linestyle='--', alpha=0.6)
+    ax11.set_yticks(np.arange(0, max(strong), 20))
+    
+    ax12.plot(years, Non, label=infostrings["Non"], color='gold', linestyle='-', marker='s', markersize=3)
+    ax12.set_title("Mixed")
+    ax12.set_xlabel("Year")
+    ax12.set_ylabel("Days")
+    ax12.set_xticks(years[::17])  # Show every tenth year on the x-axis
+    ax12.grid(True, axis='both', linestyle='--', alpha=0.6)
+    ax12.set_yticks(np.arange(0, max(strong), 20))
+        
+    plt.subplots_adjust(hspace=0.25)  # Slight global vertical spacing
+        
+    # The large plot at the bottom
+    ax8.plot(years, total, label=infostrings["total"], color='black', linestyle='-', marker='s', markersize=3)
+    ax8.set_title("Total Blocking Days Per Year")
+    ax8.set_xlabel("Year")
+    ax8.set_ylabel("Days")
+    ax8.set_xticks(years[::4])  # Show every fourth year on the x-axis
+    ax8.set_xticklabels(years[::4], rotation=45)  # Rotate the tick labels
+    ax8.set_yticks(np.arange(0, max(total), 40))  # Set major ticks every 40 units
+    ax8.set_yticks(np.arange(0, max(total), 20), minor=True)  # Set minor ticks every 20 units
+    ax8.grid(True, which="both", linestyle='--', alpha=0.6) # Apply grid for both major and minor ticks
+        
+    
+    ax1.legend(loc="upper left")
+    ax2.legend(loc="upper left")
+    ax3.legend(loc="upper left")
+    ax4.legend(loc="upper left")
+    
+    ax5.legend(loc="upper left")
+    ax6.legend(loc="upper left")
+    ax7.legend(loc="upper left")
+    
+    ax9.legend(loc="upper left")
+    ax10.legend(loc="upper left")
+    ax11.legend(loc="upper left")
+    ax12.legend(loc="upper left")
+    ax8.legend(loc="lower left")
+        
+    #ax1.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    #ax2.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    #ax3.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    #ax4.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    #ax5.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    #ax6.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    #ax7.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    ax9.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    ax10.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    ax11.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+    ax12.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
+        
+          
+    plt.setp(ax1.get_xticklabels(), visible=False)
+    plt.setp(ax2.get_xticklabels(), visible=False)
+    plt.setp(ax3.get_xticklabels(), visible=False)
+        
+    plt.setp(ax5.get_xticklabels(), visible=False)
+    plt.setp(ax6.get_xticklabels(), visible=False)
+    
+    plt.setp(ax9.get_xticklabels(), visible=False)
+    plt.setp(ax10.get_xticklabels(), visible=False)
+    plt.setp(ax11.get_xticklabels(), visible=False)
+
+        
+    #pos = ax8.get_position()
+    #ax8.set_position([pos.x0, pos.y0 - 0.04, pos.width, pos.height])
+
+    plt.suptitle("Number of Blocking Days Per Year", fontsize=12, fontname='serif', x=0.5, y=0.98)
+    plt.subplots_adjust(left=0.06, right=0.97, top=0.92, bottom=0.06, hspace=0.25, wspace=0.10)
+  
+    plt.show()
+
+     # Save the plot if needed
+    if save == "pdf":
+            plt.savefig(f"Figures/blocking_days_per_year.pdf")
+    if save == "png":
+             plt.savefig(f"Figures/blocking_days_per_year.png", dpi=400)
+        
+        # Display the plot
+    plt.show()

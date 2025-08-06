@@ -950,11 +950,11 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
 
     # Create figure and subplots
     fig, axs = size
-    fig.suptitle(f'Data from {start_time.date()} to {end_time.date()}')
+    #fig.suptitle(f'Data from {start_time.date()} to {end_time.date()}')
     
-    if locationsave:
-        fig.suptitle(f'Data during {start_time.year}, {locationsave}',
-                     fontsize=13, fontname='serif', x=0.55)
+    #if locationsave:
+        #fig.suptitle(f'Data during {start_time.year}, {locationsave}',
+                     #fontsize=13, fontname='DejaVu Sans', x=0.55)
 
     # Add shaded periods to all subplots
     for ax in axs:
@@ -962,13 +962,13 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
             ax.axvspan(start, end, color='gray', alpha=0.3)  # Light gray shading
             
     if locationsave == "Vavihill":
-        axs[0].text(0.95, 0.95, "(a)", transform= axs[0].transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        axs[1].text(0.95, 0.95, "(c)", transform=axs[1].transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        axs[2].text(0.95, 0.95, "(e)", transform=axs[2].transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+        axs[0].text(0.95, 0.95, "(a)", transform= axs[0].transAxes, fontsize=12, fontname='DejaVu Sans', ha='center', va='top')
+        axs[1].text(0.95, 0.95, "(c)", transform=axs[1].transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        axs[2].text(0.95, 0.95, "(e)", transform=axs[2].transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
     if locationsave == "Malmö":
-        axs[0].text(0.95, 0.95, "(b)", transform= axs[0].transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        axs[1].text(0.95, 0.95, "(d)", transform=axs[1].transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        axs[2].text(0.95, 0.95, "(f)", transform=axs[2].transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+        axs[0].text(0.95, 0.95, "(b)", transform= axs[0].transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        axs[1].text(0.95, 0.95, "(d)", transform=axs[1].transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        axs[2].text(0.95, 0.95, "(f)", transform=axs[2].transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
 
     # Plot Pressure
     axs[1].plot(merged_data['datetime'], merged_data['pressure'], label='Air Pressure, Helsingborg', color='red')
@@ -980,7 +980,7 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
     axs[0].plot(merged_data['datetime'], merged_data['pm2.5'], label=f'PM2.5, {locationsave}', color='green')
     axs[0].set_ylabel('PM$_{{2.5}}$ [µg/m³]')
     axs[0].set_ylim(0, 60)
-    axs[0].legend()
+    axs[0].legend(loc='upper center')
     axs[0].grid(True, axis='both', linestyle='--', alpha=0.6)
 
     
@@ -1315,8 +1315,7 @@ def plot_mean(totdata_list1, totdata_list2,
     
     #create subfgure
     fig = plt.figure(figsize=(9, 6), constrained_layout=True)  
-    fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$',
-                 fontsize=13, fontname='serif', x=0.5,)
+    #fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$', fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(2, 2, height_ratios=[1.4, 1])  # Top row is twice as tall
     
     # Create subplots using GridSpec
@@ -1339,10 +1338,10 @@ def plot_mean(totdata_list1, totdata_list2,
     tau2, slope2 = safe_mk(mean2)
     
     # Add subplot labels (a), (b), (c), (d)
-    ax1.text(0.95, 0.95, "(a)", transform=ax1.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax2.text(0.95, 0.95, "(b)", transform=ax2.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax3.text(0.95, 0.95, "(c)", transform=ax3.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax4.text(0.95, 0.95, "(d)", transform=ax4.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax1.text(0.95, 0.95, "(a)", transform=ax1.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax2.text(0.95, 0.95, "(b)", transform=ax2.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax3.text(0.95, 0.95, "(c)", transform=ax3.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax4.text(0.95, 0.95, "(d)", transform=ax4.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
     
     # Plotting for ax1
     for i, points in enumerate(valid_counts_per_hour1):
@@ -1382,7 +1381,7 @@ def plot_mean(totdata_list1, totdata_list2,
     # Plotting for ax2
     maxval = max(max(valid_counts_per_hour1), max(valid_counts_per_hour2))
     ax3.plot(t, valid_counts_per_hour1, label=f'{place1}')
-    #ax3.set_title(f'Number of datasets at {place1}', fontsize=13, fontname='serif', x=0.5)
+    #ax3.set_title(f'Number of datasets at {place1}', fontsize=13, fontname='DejaVu Sans', x=0.5)
     ax3.set_xlabel('Time from start of blocking [days]')
     ax3.set_ylabel('Number of events')
     ax3.axhline(y=minpoints, color='red', linestyle='--', linewidth=1.5, label='Minimum number of events allowed')
@@ -1393,7 +1392,7 @@ def plot_mean(totdata_list1, totdata_list2,
     
     # Plotting for ax4
     ax4.plot(t, valid_counts_per_hour2, label=f'{place2} ')
-    #ax4.set_title(f'Number of datasets at {place2}', fontsize=13, fontname='serif', x=0.5)
+    #ax4.set_title(f'Number of datasets at {place2}', fontsize=13, fontname='DejaVu Sans', x=0.5)
     ax4.set_xlabel('Time from start of blocking [days]')
     ax4.set_ylabel('Number of events')
     ax4.axhline(y=minpoints, color='red', linestyle='--', linewidth=1.5)
@@ -1470,8 +1469,7 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     
     #create subfgure
     fig = plt.figure(figsize=(9, 3.3), constrained_layout=True)  
-    fig.suptitle(r'Mean concentration of PM$_{{2.5}}$ After End of Event',
-                 fontsize=13, fontname='serif', x=0.5,)
+    #fig.suptitle(r'Mean concentration of PM$_{{2.5}}$ After End of Event',  fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(1, 2)  # Top row is twice as tall
     
     # Create subplots using GridSpec
@@ -1480,8 +1478,8 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     
     
     # Add subplot labels (a), (b), (c), (d)
-    ax1.text(0.95, 0.95, "(a)", transform=ax1.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax2.text(0.95, 0.95, "(b)", transform=ax2.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax1.text(0.95, 0.95, "(a)", transform=ax1.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax2.text(0.95, 0.95, "(b)", transform=ax2.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
    
     t_after = np.arange(hours_after) / 24
     
@@ -1608,7 +1606,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     #create subfgure
     fig = plt.figure(figsize=(9, 9), constrained_layout=True)  
     fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$',
-                 fontsize=13, fontname='serif', x=0.5,)
+                 fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(3, 2, height_ratios=[1.4, 1, 1])  # Top row is twice as tall
     
     # Create subplots using GridSpec
@@ -1623,12 +1621,12 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     tau2, slope2 = mk.original_test(mean2, 0.05)[4], mk.original_test(mean2, 0.05)[7]
     
     # Add subplot labels (a), (b), (c), (d)
-    ax1.text(0.95, 0.95, "(a)", transform=ax1.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax2.text(0.95, 0.95, "(b)", transform=ax2.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax3.text(0.95, 0.95, "(c)", transform=ax3.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax4.text(0.95, 0.95, "(d)", transform=ax4.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax5.text(0.95, 0.95, "(e)", transform=ax5.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax6.text(0.95, 0.95, "(f)", transform=ax6.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax1.text(0.95, 0.95, "(a)", transform=ax1.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax2.text(0.95, 0.95, "(b)", transform=ax2.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax3.text(0.95, 0.95, "(c)", transform=ax3.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax4.text(0.95, 0.95, "(d)", transform=ax4.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax5.text(0.95, 0.95, "(e)", transform=ax5.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax6.text(0.95, 0.95, "(f)", transform=ax6.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
     
     # Plotting for ax1
     for i, points in enumerate(valid_counts_per_hour1):
@@ -1668,7 +1666,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     # Plotting for ax2
     maxval = max(max(valid_counts_per_hour1), max(valid_counts_per_hour2))
     ax3.plot(t, valid_counts_per_hour1, label=f'{place1}')
-    #ax3.set_title(f'Number of datasets at {place1}', fontsize=13, fontname='serif', x=0.5)
+    #ax3.set_title(f'Number of datasets at {place1}', fontsize=13, fontname='DejaVu Sans', x=0.5)
     ax3.set_xlabel('Time from start of blocking [days]')
     ax3.set_ylabel('Number of events')
     ax3.axhline(y=minpoints, color='red', linestyle='--', linewidth=1.5, label='Minimum number of events allowed')
@@ -1679,7 +1677,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     
     # Plotting for ax4
     ax4.plot(t, valid_counts_per_hour2, label=f'{place2} ')
-    #ax4.set_title(f'Number of datasets at {place2}', fontsize=13, fontname='serif', x=0.5)
+    #ax4.set_title(f'Number of datasets at {place2}', fontsize=13, fontname='DejaVu Sans', x=0.5)
     ax4.set_xlabel('Time from start of blocking [days]')
     ax4.set_ylabel('Number of events')
     ax4.axhline(y=minpoints, color='red', linestyle='--', linewidth=1.5)
@@ -1832,8 +1830,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     #create subfgure
     scalingfactor = 1.1
     fig = plt.figure(figsize=(9*scalingfactor, 8.5*scalingfactor), constrained_layout=True)  
-    fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$',
-                 fontsize=13, fontname='serif', x=0.5,)
+    #fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$', fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(4, 2, height_ratios=[1, 1, 1, 1])  
     
     # Create subplots using GridSpec
@@ -1872,14 +1869,14 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
         print(f'tau for first nine days in SE for {place1} is {tau}')
     
     # Add subplot labels (a), (b), (c), (d)
-    ax11.text(0.95, 0.95, "(a)", transform=ax11.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax12.text(0.95, 0.95, "(c)", transform=ax12.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax13.text(0.95, 0.95, "(e)", transform=ax13.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax14.text(0.95, 0.95, "(g)", transform=ax14.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax21.text(0.95, 0.95, "(b)", transform=ax21.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax22.text(0.95, 0.95, "(d)", transform=ax22.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax23.text(0.95, 0.95, "(f)", transform=ax23.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax24.text(0.95, 0.95, "(h)", transform=ax24.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax11.text(0.95, 0.95, "(a)", transform=ax11.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax12.text(0.95, 0.95, "(c)", transform=ax12.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax13.text(0.95, 0.95, "(e)", transform=ax13.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax14.text(0.95, 0.95, "(g)", transform=ax14.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax21.text(0.95, 0.95, "(b)", transform=ax21.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax22.text(0.95, 0.95, "(d)", transform=ax22.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax23.text(0.95, 0.95, "(f)", transform=ax23.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax24.text(0.95, 0.95, "(h)", transform=ax24.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
     
     ax11.set_title('Direction: ' + labels[0])  # Setting the title for the first subplot
     ax11.plot(t, mean1[0], label=f'{place1}, $\\tau$={tau11}, sen-slope={slope11}', color=colors[0])  # Plot the mean1 for place1
@@ -2111,8 +2108,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     #create subfgure
     scalingfactor = 1.1
     fig = plt.figure(figsize=(9*scalingfactor, 8.5*scalingfactor), constrained_layout=True)
-    fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$',
-                     fontsize=13, fontname='serif', x=0.5,)
+    #fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$', fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(4, 2, height_ratios=[1, 1, 1, 1])  
         
     # Create subplots using GridSpec
@@ -2145,14 +2141,14 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     tau24, slope24 = safe_mk(mean2[3])
     
        # Add subplot labels (a), (b), (c), (d)
-    ax11.text(0.95, 0.95, "(a)", transform=ax11.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax12.text(0.95, 0.95, "(c)", transform=ax12.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax13.text(0.95, 0.95, "(e)", transform=ax13.transAxes, fontsize=12, fontname='serif', ha='right', va='top')        
-    ax14.text(0.95, 0.95, "(g)", transform=ax14.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax21.text(0.95, 0.95, "(b)", transform=ax21.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax22.text(0.95, 0.95, "(d)", transform=ax22.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax23.text(0.95, 0.95, "(f)", transform=ax23.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax24.text(0.95, 0.95, "(h)", transform=ax24.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax11.text(0.95, 0.95, "(a)", transform=ax11.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax12.text(0.95, 0.95, "(c)", transform=ax12.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax13.text(0.95, 0.95, "(e)", transform=ax13.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')        
+    ax14.text(0.95, 0.95, "(g)", transform=ax14.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax21.text(0.95, 0.95, "(b)", transform=ax21.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax22.text(0.95, 0.95, "(d)", transform=ax22.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax23.text(0.95, 0.95, "(f)", transform=ax23.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax24.text(0.95, 0.95, "(h)", transform=ax24.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
     
     ax11.set_title(labels[0])  # Setting the title for the first subplot
     ax11.plot(t, mean1[0], label=f'{place1}, $\\tau$={tau11}, sen-slope={slope11}', color=colors[0])  # Plot the mean1 for place1
@@ -2341,8 +2337,7 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     #create subfgure
     scalingfactor = 1.1
     fig = plt.figure(figsize=(9*scalingfactor, 8.5*4/5*scalingfactor), constrained_layout=True)  
-    fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$',
-                 fontsize=13, fontname='serif', x=0.5,)
+    #fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$', fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(3, 2, height_ratios=[1, 1, 1])  
     
     # Create subplots using GridSpec
@@ -2371,12 +2366,12 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     tau23, slope23 = safe_mk(mean2[2])
     
     # Add subplot labels (a), (b), (c), (d)
-    ax11.text(0.95, 0.95, "(a)", transform=ax11.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax12.text(0.95, 0.95, "(c)", transform=ax12.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax13.text(0.95, 0.95, "(e)", transform=ax13.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax21.text(0.95, 0.95, "(b)", transform=ax21.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax22.text(0.95, 0.95, "(d)", transform=ax22.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax23.text(0.95, 0.95, "(f)", transform=ax23.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax11.text(0.95, 0.95, "(a)", transform=ax11.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax12.text(0.95, 0.95, "(c)", transform=ax12.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax13.text(0.95, 0.95, "(e)", transform=ax13.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax21.text(0.95, 0.95, "(b)", transform=ax21.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax22.text(0.95, 0.95, "(d)", transform=ax22.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax23.text(0.95, 0.95, "(f)", transform=ax23.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
     
     ax11.set_title(labels[0])  # Setting the title for the first subplot
     ax11.plot(t, mean1[0], label=f'{place1}, $\\tau$={tau11}, sen-slope={slope11}', color=colors[0])  # Plot the mean1 for place1
@@ -2632,7 +2627,7 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
         ax.set_xticks(years[::4])  # Show every fourth year
         ax.set_xticklabels(years[::4], rotation=45)  # Rotate x-axis labels for better readability
         
-        #plt.suptitle("Number of Blocking Days Per Year ", fontsize=14, fontname='serif', x=0.5)
+        #plt.suptitle("Number of Blocking Days Per Year ", fontsize=14, fontname='DejaVu Sans', x=0.5)
         plt.tight_layout()
         
     if typ == "all":
@@ -2655,14 +2650,14 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
         ax8 = fig.add_subplot(gs[4, :])  
         
         # Add subplot labels (a), (b), (c), (d)
-        ax1.text(0.95, 0.95, "(a)", transform=ax1.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        ax2.text(0.95, 0.95, "(b)", transform=ax2.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        ax3.text(0.95, 0.95, "(c)", transform=ax3.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        ax4.text(0.95, 0.95, "(d)", transform=ax4.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        ax5.text(0.95, 0.95, "(e)", transform=ax5.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        ax6.text(0.95, 0.95, "(f)", transform=ax6.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        ax7.text(0.95, 0.95, "(g)", transform=ax7.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-        ax8.text(0.95, 0.95, "(h)", transform=ax8.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+        ax1.text(0.95, 0.95, "(a)", transform=ax1.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        ax2.text(0.95, 0.95, "(b)", transform=ax2.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        ax3.text(0.95, 0.95, "(c)", transform=ax3.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        ax4.text(0.95, 0.95, "(d)", transform=ax4.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        ax5.text(0.95, 0.95, "(e)", transform=ax5.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        ax6.text(0.95, 0.95, "(f)", transform=ax6.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        ax7.text(0.95, 0.95, "(g)", transform=ax7.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        ax8.text(0.95, 0.95, "(h)", transform=ax8.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
         
         seasons = ["winter", "spring", "summer", "autumn", "strong", "weak", "medium", "total"]
         infostrings = {}
@@ -2786,7 +2781,7 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
                   # Adjust layout for better spacing
         #plt.tight_layout(rect=[0, 0, 1, 0.95], h_pad=0, w_pad=0)  # Increase h_pad and w_pad as needed
                 
-        plt.suptitle("Number of Blocking Days Per Year ", fontsize=12, fontname='serif', x=0.5)
+        #plt.suptitle("Number of Blocking Days Per Year ", fontsize=12, fontname='DejaVu Sans', x=0.5)
   
         plt.show()
 
@@ -2854,7 +2849,7 @@ def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
         ax.set_xlabel('Year', fontsize=12)
         ax.set_ylabel('Number of Blockings', fontsize=12)
         ax.set_title(f'Number of Blockings Per Year and Blockings > {lim1} Days', 
-                 fontsize=14, fontname='serif', x=0.5)
+                 fontsize=14, fontname='DejaVu Sans', x=0.5)
     
         # Set x-ticks every 4 years and rotate labels
         ax.set_xticks([i for i in range(0, len(years), 3)])  # Set ticks every 4th year
@@ -2879,8 +2874,7 @@ def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
         # Labels and title
         ax.set_xlabel('Year', fontsize=12)
         ax.set_ylabel('Number of events', fontsize=12)
-        ax.set_title('Number of Blocking events Per Year', 
-                     fontsize=14, fontname='serif', x=0.5)
+        #ax.set_title('Number of Blocking events Per Year', fontsize=14, fontname='DejaVu Sans', x=0.5)
         
         # Set x-ticks every 3 years and rotate labels
         ax.set_xticks([i for i in range(0, len(years), 5)])  
@@ -3036,21 +3030,21 @@ def plot_blockingsdays_by_year(block_list, save=False):
 
         
     # Add subplot labels (a), (b), (c), (d)
-    ax1.text(0.95, 0.95, "(e)", transform=ax1.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax2.text(0.95, 0.95, "(f)", transform=ax2.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax3.text(0.95, 0.95, "(g)", transform=ax3.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax4.text(0.95, 0.95, "(h)", transform=ax4.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax1.text(0.95, 0.95, "(e)", transform=ax1.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax2.text(0.95, 0.95, "(f)", transform=ax2.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax3.text(0.95, 0.95, "(g)", transform=ax3.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax4.text(0.95, 0.95, "(h)", transform=ax4.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
     
-    ax5.text(0.95, 0.95, "(i)", transform=ax5.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax6.text(0.95, 0.95, "(j)", transform=ax6.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax7.text(0.95, 0.95, "(k)", transform=ax7.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax5.text(0.95, 0.95, "(i)", transform=ax5.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax6.text(0.95, 0.95, "(j)", transform=ax6.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax7.text(0.95, 0.95, "(k)", transform=ax7.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
     
-    ax9.text(0.95, 0.95, "(a)", transform=ax9.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax10.text(0.95, 0.95, "(b)", transform=ax10.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax11.text(0.95, 0.95, "(c)", transform=ax11.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
-    ax12.text(0.95, 0.95, "(d)", transform=ax12.transAxes, fontsize=12, fontname='serif', ha='right', va='top')    
+    ax9.text(0.95, 0.95, "(a)", transform=ax9.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax10.text(0.95, 0.95, "(b)", transform=ax10.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax11.text(0.95, 0.95, "(c)", transform=ax11.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    ax12.text(0.95, 0.95, "(d)", transform=ax12.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')    
     
-    ax8.text(0.95, 0.95, "(l)", transform=ax8.transAxes, fontsize=12, fontname='serif', ha='right', va='top')
+    ax8.text(0.95, 0.95, "(l)", transform=ax8.transAxes, fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
         
         
     labels = ["NE", "SE", "W", "Non", 
@@ -3190,7 +3184,7 @@ def plot_blockingsdays_by_year(block_list, save=False):
     #pos = ax8.get_position()
     #ax8.set_position([pos.x0, pos.y0 - 0.04, pos.width, pos.height])
 
-    plt.suptitle("Number of Blocking Days Per Year", fontsize=12, fontname='serif', x=0.5, y=0.98)
+    #plt.suptitle("Number of Blocking Days Per Year", fontsize=12, fontname='DejaVu Sans', x=0.5, y=0.98)
     plt.subplots_adjust(left=0.06, right=0.97, top=0.92, bottom=0.06, hspace=0.25, wspace=0.10)
   
     plt.show()

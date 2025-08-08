@@ -21,7 +21,7 @@ warnings.simplefilter("ignore", category=UserWarning)
 plt.close('all')
 
 info   = False          #<-------- CHANGE IF YOU WANT
-imsave = False         # Can be pdf, png, False
+imsave = "png"         # Can be pdf, png, False
 
 press_lim   = 1014   # This is the pressure limit for classifying high pressure
 dur_lim     = 5      # Minimum number of days for blocking
@@ -105,22 +105,21 @@ blocking_list_Malmö, blocking_list_Vavihill = read.date_calibrate_blockinglists
 
 read.plot_period(PM_data_Vavihill, wind_data_Vavihill, rain_data_Vavihill, 
                  pressure_data, blocking_list_Vavihill,
-                 start_time='2001-01-01', 
-                 end_time='2001-12-31',
+                 start_time='2022-01-01', 
+                 end_time='2022-12-31',
                  wind_plot=False,
                  locationsave="Vavihill",
                  save=imsave)
 
 read.plot_period(PM_data_Malmö, wind_data_Malmö, rain_data_Malmö, 
                  pressure_data, blocking_list_Malmö,
-                 start_time='2001-01-01', 
-                 end_time='2001-12-31',
+                 start_time='2022-01-01', 
+                 end_time='2022-12-31',
                  wind_plot=False,
                  locationsave="Malmö",
                  save=imsave)
 
 if not info: print('2. The period plots are done')
-
 
 
 ##############################################################################

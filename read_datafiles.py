@@ -58,8 +58,8 @@ def get_pressure_data(filename,
         plt.grid(True, axis='both', linestyle='--', alpha=0.6)
 
         plt.tight_layout()
-        plt.legend()
-        plt.show()
+        plt.legend(framealpha=0.55)
+        #plt.show()
 
     return datafile # return a datafile of all the data 
 
@@ -103,8 +103,8 @@ def get_wind_data(filename,
         plt.grid(True, axis='both', linestyle='--', alpha=0.6)
 
         plt.tight_layout()
-        plt.legend()
-        plt.show()
+        plt.legend(framealpha=0.55)
+        #plt.show()
     return datafile # return a datafile of all the data 
 
 def get_rain_data(filename, 
@@ -144,8 +144,8 @@ def get_rain_data(filename,
         plt.grid(True, axis='both', linestyle='--', alpha=0.6)
 
         plt.tight_layout()
-        plt.legend()
-        plt.show()
+        plt.legend(framealpha=0.55)
+        #plt.show()
     return datafile # return a datafile of all the data 
 
 def get_daily_rain_data(filename, plot=False):
@@ -195,9 +195,9 @@ def get_daily_rain_data(filename, plot=False):
         plt.xticks(rotation=45)
         plt.grid(True, axis='both', linestyle='--', alpha=0.6)
 
-        plt.legend()
+        plt.legend(framealpha=0.55)
         plt.tight_layout()
-        plt.show()
+        #plt.show()
 
     return datafile
 
@@ -243,8 +243,8 @@ def get_temp_data(filename,
         plt.grid(True, axis='both', linestyle='--', alpha=0.6)
 
         plt.tight_layout()
-        plt.legend()
-        plt.show()
+        plt.legend(framealpha=0.55)
+        #plt.show()
     return datafile # return a datafile of all the data 
     
 def get_pm_data(filename, 
@@ -282,8 +282,8 @@ def get_pm_data(filename,
         plt.grid(True, axis='both', linestyle='--', alpha=0.6)
 
         plt.tight_layout()
-        plt.legend()
-        plt.show()
+        plt.legend(framealpha=0.55)
+        #plt.show()
     return datafile  # Return the cleaned data
 
 """
@@ -357,7 +357,7 @@ def yearly_histogram(data, datatype, location=False, save=False):
         plt.savefig(f"Figures/yearly_{datatype}_{location}.pdf")
     if save=="png":
         plt.savefig(f"Figures/yearly_{datatype}_{location}.png", dpi=400)
-    plt.show()
+    #plt.show()
 
 """
 The functions are for extracting the blocking period from pressure data
@@ -443,8 +443,8 @@ def find_blocking(pres_data, rain_data, pressure_limit, duration_limit,
                 plt.xticks(rotation=45)
                 plt.grid(True, axis='both', linestyle='--', alpha=0.6)
                 plt.tight_layout()
-                plt.legend()
-                plt.show()
+                plt.legend(framealpha=0.55)
+                #plt.show()
 
             # Drop helper columns only after filtering
             streak_data = streak_data.drop(columns=['highp', 'streak_id', 'rain'])
@@ -651,14 +651,14 @@ def array_extra_period(PM_data, wind_data, temp_data, rain_data, pressure_data,
         # Plot Pressure
         axs[0].plot(time, pressure, label='Air Pressure', color='blue')
         axs[0].set_ylabel('Air Pressure (hPa)')
-        axs[0].legend()
+        axs[0].legend(framealpha=0.55)
         axs[0].grid(True, axis='both', linestyle='--', alpha=0.6)
 
             
         # Plot PM2.5
         axs[1].plot(time, pm25, label='PM2.5', color='green')
         axs[1].set_ylabel('PM$_{{2.5}}$ (µg/m³)')
-        axs[1].legend()
+        axs[1].legend(framealpha=0.55)
         axs[1].set_ylim(0,60)
         axs[1].grid(True, axis='both', linestyle='--', alpha=0.6)
 
@@ -666,7 +666,7 @@ def array_extra_period(PM_data, wind_data, temp_data, rain_data, pressure_data,
         # Plot Wind Direction
         axs[2].scatter(time, wind_dir, label='Wind Direction', color='orange', s=7)
         axs[2].set_ylabel('Wind Direction (°)')
-        axs[2].legend()
+        axs[2].legend(framealpha=0.55)
         axs[2].set_yticks([0, 90, 180, 270, 365])
         axs[2].set_ylim(0,365)
         axs[2].grid(True, axis='both', linestyle='--', alpha=0.6)
@@ -676,14 +676,14 @@ def array_extra_period(PM_data, wind_data, temp_data, rain_data, pressure_data,
         axs[3].plot(time, wind_speed, label='Wind Speed', color='teal')
         axs[3].set_ylabel('Wind Speed (m/s)')
         axs[3].set_ylim(0,14)
-        axs[3].legend()
+        axs[3].legend(framealpha=0.55)
         axs[3].grid(True, axis='both', linestyle='--', alpha=0.6)
 
         
         # Plot temp
         axs[4].plot(time, temp, label='Temperatre', color='red')
         axs[4].set_ylabel('Temperature (°C)')
-        axs[4].legend()
+        axs[4].legend(framealpha=0.55)
         axs[4].grid(True, axis='both', linestyle='--', alpha=0.6)
 
         
@@ -691,14 +691,14 @@ def array_extra_period(PM_data, wind_data, temp_data, rain_data, pressure_data,
         axs[5].plot(time, rain, label='Rain', color='darkblue')
         axs[5].set_ylabel('Rainfall (mm)')
         axs[5].set_xlabel('Time from start of period [days]')
-        axs[5].legend()
+        axs[5].legend(framealpha=0.55)
         axs[5].grid(True, axis='both', linestyle='--', alpha=0.6)
 
         if save=="pdf":
             plt.savefig(f"Figures/plot_{start_time}_to_{end_time}.pdf")
         if save=="pdf":
                 plt.savefig(f"Figures/plot_{start_time}_to_{end_time}.png", dpi=400)
-        plt.show()
+        #plt.show()
     
     return array # Return list of all the datafiles
 
@@ -834,14 +834,14 @@ def plot_blocking_array(array, array_title=False, extrainfo=True, save=False):
         # Plot Pressure
         axs[0].plot(time, pressure, label='Air Pressure', color='blue')
         axs[0].set_ylabel('Air Pressure (hPa)')
-        axs[0].legend()
+        axs[0].legend(framealpha=0.55)
         axs[0].grid(True, axis='both', linestyle='--', alpha=0.6)
 
         
         # Plot PM2.5
         axs[1].plot(time, pm25, label='PM2.5', color='green')
         axs[1].set_ylabel('PM$_{{2.5}}$ [µg/m³]')
-        axs[1].legend()
+        axs[1].legend(framealpha=0.55)
         axs[1].set_ylim(0,60)
         axs[1].grid(True, axis='both', linestyle='--', alpha=0.6)
 
@@ -854,14 +854,14 @@ def plot_blocking_array(array, array_title=False, extrainfo=True, save=False):
         # Plot Pressure
         axs[0].plot(time, pressure, label='Air Pressure', color='blue')
         axs[0].set_ylabel('Air Pressure [hPa]')
-        axs[0].legend()
+        axs[0].legend(framealpha=0.55)
         axs[0].grid(True, axis='both', linestyle='--', alpha=0.6)
 
         
         # Plot PM2.5
         axs[1].plot(time, pm25, label='PM2.5', color='green')
         axs[1].set_ylabel('PM$_{{2.5}}$ [µg/m³]')
-        axs[1].legend()
+        axs[1].legend(framealpha=0.55)
         axs[1].set_ylim(0,60)
         axs[1].grid(True, axis='both', linestyle='--', alpha=0.6)
 
@@ -869,7 +869,7 @@ def plot_blocking_array(array, array_title=False, extrainfo=True, save=False):
         # Plot Wind Direction
         axs[2].scatter(time, wind_dir, label='Wind Direction', color='orange', s=7)
         axs[2].set_ylabel('Wind Direction [°]')
-        axs[2].legend()
+        axs[2].legend(framealpha=0.55)
         axs[2].set_yticks([0, 90, 180, 270, 365])
         axs[2].set_ylim(0,365)
         axs[2].grid(True, axis='both', linestyle='--', alpha=0.6)
@@ -879,7 +879,7 @@ def plot_blocking_array(array, array_title=False, extrainfo=True, save=False):
         axs[3].plot(time, wind_speed, label='Wind Speed', color='teal')
         axs[3].set_ylabel('Wind Speed [m/s]')
         axs[3].set_ylim(0,10)
-        axs[3].legend()
+        axs[3].legend(framealpha=0.55)
         axs[3].grid(True, axis='both', linestyle='--', alpha=0.6)
 
 
@@ -888,7 +888,7 @@ def plot_blocking_array(array, array_title=False, extrainfo=True, save=False):
         axs[4].plot(time, rain, label='Rain', color='darkblue')
         axs[4].set_ylabel('Rainfall [mm]')
         axs[4].set_xlabel('Time from start of blocking period [days]')
-        axs[4].legend()
+        axs[4].legend(framealpha=0.55)
         axs[4].set_ylim(0,0.5)
         axs[4].grid(True, axis='both', linestyle='--', alpha=0.6)
 
@@ -896,7 +896,7 @@ def plot_blocking_array(array, array_title=False, extrainfo=True, save=False):
             plt.savefig(f"Figures/{array_title}.pdf")
         if save=="png":
             plt.savefig(f"Figures/{array_title}.png", dpi=400)
-        plt.show()
+        #plt.show()
 
 
 
@@ -973,14 +973,14 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
     # Plot Pressure
     axs[1].plot(merged_data['datetime'], merged_data['pressure'], label='Air Pressure, Helsingborg', color='red')
     axs[1].set_ylabel('Air Pressure [hPa]')
-    axs[1].legend()
+    axs[1].legend(framealpha=0.55)
     axs[1].grid(True, axis='both', linestyle='--', alpha=0.6)
 
     # Plot PM2.5
     axs[0].plot(merged_data['datetime'], merged_data['pm2.5'], label=f'PM2.5, {locationsave}', color='green')
     axs[0].set_ylabel('PM$_{{2.5}}$ [µg/m³]')
     axs[0].set_ylim(0, 60)
-    axs[0].legend(loc='upper center')
+    axs[0].legend(framealpha=0.55, loc='upper center')
     axs[0].grid(True, axis='both', linestyle='--', alpha=0.6)
 
     
@@ -993,7 +993,7 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
         axs[2].set_ylabel('Wind Direction (°)')
         axs[2].set_yticks([0, 90, 180, 270, 360])
         axs[2].set_ylim(0, 360)
-        axs[2].legend()
+        axs[2].legend(framealpha=0.55)
         axs[2].grid(True, axis='both', linestyle='--', alpha=0.6)
 
     
@@ -1001,7 +1001,7 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
         axs[3].plot(merged_data['datetime'], merged_data['speed'], label='Wind Speed', color='teal')
         axs[3].set_ylabel('Wind Speed (m/s)')
         axs[3].set_ylim(0, 14)
-        axs[3].legend()
+        axs[3].legend(framealpha=0.55)
         axs[3].grid(True, axis='both', linestyle='--', alpha=0.6)
 
     if locationsave == "Vavihill":
@@ -1014,7 +1014,7 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
     axs[n].set_ylabel('Rainfall [mm]')
     
     axs[n].set_xlabel('Date')
-    axs[n].legend(loc="upper left")
+    axs[n].legend(framealpha=0.55, loc="upper left")
     axs[n].grid(True, axis='both', linestyle='--', alpha=0.6)
 
     axs[n].tick_params(axis='x', rotation=45)
@@ -1026,7 +1026,126 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
     if save=="png":
         plt.savefig(f'Figures/{locationsave}_plot_{start_time.strftime("%Y%m%d")}_{end_time.strftime("%Y%m%d")}.png', dpi=400)
     
-    plt.show()       
+    #plt.show() 
+          
+def plot_period_both(PM_data_1, rain_data_1, pressure_data, blocking_list_1, location1,
+                     PM_data_2, rain_data_2, blocking_list_2, location2,
+                     start_time, end_time, save=False):
+    """
+    Plot PM2.5, air pressure, and rainfall for two locations side by side
+    with panel labels (a–f).
+    """
+
+    start_time = pd.to_datetime(start_time)
+    end_time = pd.to_datetime(end_time)
+
+    #  Location 1 filtering 
+    PM_data_1 = PM_data_1.rename(columns={'datetime_start': 'datetime'})
+    pressure_data_1 = pressure_data[(pressure_data['datetime'] >= start_time) & (pressure_data['datetime'] <= end_time)]
+    PM_data_1 = PM_data_1[(PM_data_1['datetime'] >= start_time) & (PM_data_1['datetime'] <= end_time)]
+    rain_data_1 = rain_data_1[(rain_data_1['datetime'] >= start_time) & (rain_data_1['datetime'] <= end_time)]
+
+    merged_1 = (pressure_data_1
+                .merge(PM_data_1, on='datetime', how='outer')
+                .merge(rain_data_1, on='datetime', how='outer')
+                .sort_values(by='datetime')
+                .reset_index(drop=True))
+
+    #  Location 2 filtering 
+    PM_data_2 = PM_data_2.rename(columns={'datetime_start': 'datetime'})
+    pressure_data_2 = pressure_data[(pressure_data['datetime'] >= start_time) & (pressure_data['datetime'] <= end_time)]
+    PM_data_2 = PM_data_2[(PM_data_2['datetime'] >= start_time) & (PM_data_2['datetime'] <= end_time)]
+    rain_data_2 = rain_data_2[(rain_data_2['datetime'] >= start_time) & (rain_data_2['datetime'] <= end_time)]
+
+    merged_2 = (pressure_data_2
+                .merge(PM_data_2, on='datetime', how='outer')
+                .merge(rain_data_2, on='datetime', how='outer')
+                .sort_values(by='datetime')
+                .reset_index(drop=True))
+
+    #  Blocking periods 
+    periods_1 = [(min(df['datetime']), max(df['datetime'])) for df in blocking_list_1]
+    periods_2 = [(min(df['datetime']), max(df['datetime'])) for df in blocking_list_2]
+
+    #  Create figure 
+    fig, axes = plt.subplots(3, 2, figsize=(10, 6), sharex=True)
+
+    #  LEFT PLOT
+    axes[0,0].plot(merged_1['datetime'], merged_1['pm2.5'], color='green', label=f'PM2.5, Vavihill')
+    axes[0,0].set_ylabel('PM$_{2.5}$ [µg/m³]')
+    axes[0,0].set_ylim(0, 60)
+    axes[0,0].legend(framealpha=0.55, loc='upper center')
+    axes[0,0].grid(True, linestyle='--', alpha=0.6)
+
+    axes[1,0].plot(merged_1['datetime'], merged_1['pressure'], color='red', label='Air Pressure, Helsingborg')
+    axes[1,0].set_ylabel('Air Pressure [hPa]')
+    axes[1,0].legend(framealpha=0.55, loc='lower right')
+    axes[1,0].grid(True, linestyle='--', alpha=0.6)
+
+    axes[2,0].plot(merged_1['datetime'], merged_1['rain'], color='blue', label=f'Pecipitation, Hörby')
+    axes[2,0].set_ylabel('Rainfall [mm]')
+    axes[2,0].set_xlabel('Date')
+    axes[2,0].legend(framealpha=0.55, loc='upper left')
+    axes[2,0].grid(True, linestyle='--', alpha=0.6)
+
+    for ax in axes[:,0]:
+        for start, end in periods_1:
+            ax.axvspan(start, end, color='gray', alpha=0.3)
+        ax.set_xlim(start_time, end_time)
+        ax.tick_params(axis='x', rotation=45)
+
+    # Add panel labels for left column
+    axes[0,0].text(0.95, 0.95, "(a)", transform=axes[0,0].transAxes,
+                   fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    axes[1,0].text(0.95, 0.95, "(c)", transform=axes[1,0].transAxes,
+                   fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    axes[2,0].text(0.95, 0.95, "(e)", transform=axes[2,0].transAxes,
+                   fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+
+    # RIGHT PLOT
+    axes[0,1].plot(merged_2['datetime'], merged_2['pm2.5'], color='green', label=f'PM2.5, Malmö')
+    axes[0,1].set_ylabel('PM$_{2.5}$ [µg/m³]')
+    axes[0,1].set_ylim(0, 60)
+    axes[0,1].legend(framealpha=0.55, loc='upper center')
+    axes[0,1].grid(True, linestyle='--', alpha=0.6)
+
+    axes[1,1].plot(merged_2['datetime'], merged_2['pressure'], color='red', label='Air Pressure, Helsingborg')
+    axes[1,1].set_ylabel('Air Pressure [hPa]')
+    axes[1,1].legend(framealpha=0.55, loc='lower right')
+    axes[1,1].grid(True, linestyle='--', alpha=0.6)
+
+    axes[2,1].plot(merged_2['datetime'], merged_2['rain'], color='blue', label=f'Pecipitation, Malmö')
+    axes[2,1].set_ylabel('Rainfall [mm]')
+    axes[2,1].set_xlabel('Date')
+    axes[2,1].legend(framealpha=0.55, loc='upper left')
+    axes[2,1].grid(True, linestyle='--', alpha=0.6)
+    
+
+    for ax in axes[:,1]:
+        for start, end in periods_2:
+            ax.axvspan(start, end, color='gray', alpha=0.3)
+        ax.set_xlim(start_time, end_time)
+        ax.tick_params(axis='x', rotation=45)
+
+    # Add panel labels for right column
+    axes[0,1].text(0.95, 0.95, "(b)", transform=axes[0,1].transAxes,
+                   fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    axes[1,1].text(0.95, 0.95, "(d)", transform=axes[1,1].transAxes,
+                   fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    axes[2,1].text(0.95, 0.95, "(f)", transform=axes[2,1].transAxes,
+                   fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+
+    plt.tight_layout()
+
+    if save == "png":
+        plt.savefig(f"Figures/{location1}_{location2}_plot_{start_time.strftime('%Y%m%d')}_{end_time.strftime('%Y%m%d')}.png", dpi=400)
+    elif save == "pdf":
+        plt.savefig(f"Figures/{location1}_{location2}_plot_{start_time.strftime('%Y%m%d')}_{end_time.strftime('%Y%m%d')}.pdf")
+    elif save == "Figure.png":
+        plt.savefig("Figures/Figure4.png", dpi=400)
+    else:
+        plt.show()
+
 
 """
 These functions sort the totdatalists into catatgories. 
@@ -1120,7 +1239,7 @@ def sort_wind_dir(totdata_list, upperlim=False, lowerlim=False, pie=False, save=
             plt.savefig("Figures/PieChart.pdf", bbox_inches="tight")
         if save=="png":
              plt.savefig("Figures/PieChart.png", dpi=400, bbox_inches="tight")
-        plt.show()
+        #plt.show()
         
     # Print Summary
     if pieinfo:
@@ -1204,7 +1323,7 @@ def sort_season(totdata_list, totdata_list_dates, pie=False, save=False,
             plt.savefig("Figures/PieChart.pdf", bbox_inches="tight")
         if save=="png":
              plt.savefig("Figures/PieChart.png", dpi=400, bbox_inches="tight")
-        plt.show()
+        #plt.show()
         
     # Print Summary
     if pieinfo:
@@ -1263,7 +1382,7 @@ def sort_pressure(totdata_list, pie=False, save=False, pieinfo=False, limits=[10
             plt.savefig("Figures/PieChart.pdf", bbox_inches="tight")
         if save=="png":
              plt.savefig("Figures/PieChart.png", dpi=400, bbox_inches="tight")
-        plt.show()
+        #plt.show()
         
     # Print summary in a single line with explicit pressure thresholds
     if pieinfo:
@@ -1358,7 +1477,7 @@ def plot_mean(totdata_list1, totdata_list2,
     ax1.set_ylabel('PM2.5 [µg/m³]')
     ax1.set_ylim(0, 35)
     ax1.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax1.legend()
+    ax1.legend(framealpha=0.55)
     
     # Plotting for ax3
     for i, points in enumerate(valid_counts_per_hour2):
@@ -1375,7 +1494,7 @@ def plot_mean(totdata_list1, totdata_list2,
     ax2.set_ylabel('PM$_{{2.5}}$ [µg/m³]')
     ax2.set_ylim(0, 35)
     ax2.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax2.legend()
+    ax2.legend(framealpha=0.55)
 
     
     # Plotting for ax2
@@ -1387,7 +1506,7 @@ def plot_mean(totdata_list1, totdata_list2,
     ax3.axhline(y=minpoints, color='red', linestyle='--', linewidth=1.5, label='Minimum number of events allowed')
     ax3.set_yticks(np.arange(0, 201, 50))
     ax3.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax3.legend(loc='upper left')
+    ax3.legend(framealpha=0.55, loc='upper left')
     
     
     # Plotting for ax4
@@ -1398,7 +1517,7 @@ def plot_mean(totdata_list1, totdata_list2,
     ax4.axhline(y=minpoints, color='red', linestyle='--', linewidth=1.5)
     ax4.set_yticks(np.arange(0, 201, 50))
     ax4.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax4.legend(loc='center left')
+    ax4.legend(framealpha=0.55, loc='center left')
     
     ax1.set_xlim(0,daystoplot)
     ax2.set_xlim(0,daystoplot)
@@ -1411,11 +1530,13 @@ def plot_mean(totdata_list1, totdata_list2,
     
     if save=="pdf":
         plt.savefig("Figures/Meanplot.pdf")
-    if save=="png":
+    elif save=="png":
         plt.savefig("Figures/Meanplot.png", dpi=400)
+    elif save == "Figure.png":
+        plt.savefig("Figures/Figure5.png", dpi=400)
+    else:
+        plt.show()
         
-    plt.show() 
-
     
 def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
                     daystoplot, minpoints=8, place1='', place2='',
@@ -1493,7 +1614,7 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     ax1.set_ylabel('PM2.5 [µg/m³]')
     ax1.set_ylim(0, 35)
     ax1.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax1.legend(loc='upper left')
+    ax1.legend(framealpha=0.55, loc='upper left')
     
     ax2.plot(t_after, mean_after2, label=f'{place2}', c='C1')
     ax2.plot(t_after, pm_mean2 + t_after * 0, c='gray')
@@ -1504,7 +1625,7 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     ax2.set_ylabel('PM2.5 [µg/m³]')
     ax2.set_ylim(0, 35)
     ax2.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax2.legend(loc='upper left')
+    ax2.legend(framealpha=0.55, loc='upper left')
     
     ax1.set_xlim(0,daystoplot)
     ax2.set_xlim(0,daystoplot)
@@ -1514,10 +1635,12 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     
     if save=="pdf":
         plt.savefig("Figures/Meanplot_after.pdf")
-    if save=="png":
+    elif save=="png":
         plt.savefig("Figures/Meanplot_after.png", dpi=400)
-        
-    plt.show()     
+    elif save == "Figure.png":
+        plt.savefig("Figures/Figure6.png", dpi=400)
+    else:
+        plt.show()     
     
 def plot_mean_w_after(totdata_list1, totdata_list2, 
                       pm_data1, blocking_list1, pm_data2, blocking_list2,
@@ -1643,7 +1766,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     ax1.set_ylabel('PM2.5 [µg/m³]')
     ax1.set_ylim(0, 35)
     ax1.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax1.legend()
+    ax1.legend(framealpha=0.55)
     
     # Plotting for ax3
     for i, points in enumerate(valid_counts_per_hour2):
@@ -1660,7 +1783,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     ax2.set_ylabel('PM$_{{2.5}}$ [µg/m³]')
     ax2.set_ylim(0, 35)
     ax2.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax2.legend()
+    ax2.legend(framealpha=0.55)
 
     
     # Plotting for ax2
@@ -1672,7 +1795,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     ax3.axhline(y=minpoints, color='red', linestyle='--', linewidth=1.5, label='Minimum number of events allowed')
     ax3.set_yticks(np.arange(0, 201, 50))
     ax3.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax3.legend(loc='upper left')
+    ax3.legend(framealpha=0.55, loc='upper left')
     
     
     # Plotting for ax4
@@ -1683,7 +1806,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     ax4.axhline(y=minpoints, color='red', linestyle='--', linewidth=1.5)
     ax4.set_yticks(np.arange(0, 201, 50))
     ax4.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax4.legend(loc='center left')
+    ax4.legend(framealpha=0.55, loc='center left')
     
     t_after = np.arange(hours_after) / 24
 
@@ -1696,7 +1819,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     ax5.set_ylabel('PM2.5 [µg/m³]')
     ax5.set_ylim(0, 35)
     ax5.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax5.legend()
+    ax5.legend(framealpha=0.55)
     
     ax6.plot(t_after, mean_after1, label=f'{place1}', c='C2')
     ax6.plot(t_after, pm_mean1 + t_after * 0, c='gray')
@@ -1707,7 +1830,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     ax6.set_ylabel('PM2.5 [µg/m³]')
     ax6.set_ylim(0, 35)
     ax6.grid(True, axis='both', linestyle='--', alpha=0.6)
-    ax6.legend()
+    ax6.legend(framealpha=0.55)
     
     
     
@@ -1725,7 +1848,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     if save=="png":
         plt.savefig("Figures/Meanplot.png", dpi=400)
         
-    plt.show() 
+    #plt.show() 
     
 def sigma_dir_mean(blocking_list1, PM_data1, wind_data1, sort=0.5):
     """
@@ -1888,7 +2011,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax11.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax11.set_ylim(0, 35)  # Set the Y-axis limits
     ax11.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax11.legend()  # Display legend
+    ax11.legend(framealpha=0.55)  # Display legend
     ax11.set_xticklabels([])
     
     ax12.set_title('Direction: ' + labels[1])  # Setting the title for the first subplot
@@ -1901,7 +2024,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax12.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax12.set_ylim(0, 35)  # Set the Y-axis limits
     ax12.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax12.legend()  # Display legend
+    ax12.legend(framealpha=0.55)  # Display legend
     ax12.set_xticklabels([])
 
     
@@ -1915,7 +2038,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax13.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax13.set_ylim(0, 35)  # Set the Y-axis limits
     ax13.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax13.legend()  # Display legend
+    ax13.legend(framealpha=0.55)  # Display legend
     ax13.set_xticklabels([])
 
     
@@ -1930,7 +2053,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax14.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax14.set_ylim(0, 35)  # Set the Y-axis limits
     ax14.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax14.legend()  # Display legend
+    ax14.legend(framealpha=0.55)  # Display legend
     ax14.set_xticks(np.arange(0, daystoplot+1, 2))
 
     
@@ -1944,7 +2067,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax21.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax21.set_ylim(0, 35)  # Set the Y-axis limits
     ax21.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax21.legend()  # Display legend
+    ax21.legend(framealpha=0.55)  # Display legend
     ax21.set_xticklabels([])
 
     
@@ -1958,7 +2081,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax22.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax22.set_ylim(0, 35)  # Set the Y-axis limits
     ax22.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax22.legend()  # Display legend
+    ax22.legend(framealpha=0.55)  # Display legend
     ax22.set_xticklabels([])
 
     
@@ -1972,7 +2095,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax23.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax23.set_ylim(0, 35)  # Set the Y-axis limits
     ax23.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax23.legend()  # Display legend
+    ax23.legend(framealpha=0.55)  # Display legend
     ax23.set_xticklabels([])
 
     
@@ -1987,7 +2110,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax24.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax24.set_ylim(0, 35)  # Set the Y-axis limits
     ax24.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax24.legend()  # Display legend
+    ax24.legend(framealpha=0.55)  # Display legend
     ax24.set_xticks(np.arange(0, daystoplot+1, 2))
     
     ax11.set_xlim(0,daystoplot)
@@ -2006,10 +2129,13 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
             
     if save=="pdf":
         plt.savefig("Figures/Meanplot_dir.pdf")
-    if save=="png":
+    elif save=="png":
         plt.savefig("Figures/Meanplot_dir.png", dpi=400)
+    elif save == "Figure.png":
+        plt.savefig("Figures/Figure7.png", dpi=400)
+    else:
+        plt.show()
         
-    plt.show()
 
 def sigma_seasonal_mean(blocking_list1, PM_data1):
     """
@@ -2160,7 +2286,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax11.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax11.set_ylim(0, 35)  # Set the Y-axis limits
     ax11.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax11.legend()  # Display legend
+    ax11.legend(framealpha=0.55)  # Display legend
     ax11.set_xticklabels([])
         
     ax12.set_title(labels[1])  # Setting the title for the first subplot
@@ -2173,7 +2299,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax12.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax12.set_ylim(0, 35)  # Set the Y-axis limits
     ax12.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax12.legend()  # Display legend
+    ax12.legend(framealpha=0.55)  # Display legend
     ax12.set_xticklabels([])
 
         
@@ -2187,7 +2313,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax13.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax13.set_ylim(0, 35)  # Set the Y-axis limits
     ax13.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax13.legend()  # Display legend
+    ax13.legend(framealpha=0.55)  # Display legend
     ax13.set_xticklabels([])
 
         
@@ -2202,7 +2328,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax14.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax14.set_ylim(0, 35)  # Set the Y-axis limits
     ax14.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax14.legend()  # Display legend
+    ax14.legend(framealpha=0.55)  # Display legend
     ax14.set_xticks(np.arange(0, daystoplot+1, 2))
 
         
@@ -2216,7 +2342,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax21.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax21.set_ylim(0, 35)  # Set the Y-axis limits
     ax21.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax21.legend()  # Display legend
+    ax21.legend(framealpha=0.55)  # Display legend
     ax21.set_xticklabels([])
 
         
@@ -2230,7 +2356,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax22.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax22.set_ylim(0, 35)  # Set the Y-axis limits
     ax22.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax22.legend()  # Display legend
+    ax22.legend(framealpha=0.55)  # Display legend
     ax22.set_xticklabels([])
 
         
@@ -2244,7 +2370,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax23.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax23.set_ylim(0, 35)  # Set the Y-axis limits
     ax23.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax23.legend()  # Display legend
+    ax23.legend(framealpha=0.55)  # Display legend
     ax23.set_xticklabels([])
 
         
@@ -2259,7 +2385,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax24.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax24.set_ylim(0, 35)  # Set the Y-axis limits
     ax24.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax24.legend()  # Display legend
+    ax24.legend(framealpha=0.55)  # Display legend
     ax24.set_xticks(np.arange(0, daystoplot+1, 2))
 
     ax11.set_xlim(0,daystoplot)
@@ -2276,10 +2402,13 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
         
     if save=="pdf":
             plt.savefig("Figures/Meanplot_seasonal.pdf")
-    if save=="png":
+    elif save=="png":
             plt.savefig("Figures/Meanplot_seasonal.png", dpi=400)
+    elif save == "Figure.png":
+        plt.savefig("Figures/Figure8.png", dpi=400)
+    else:
+        plt.show()
             
-    plt.show()
 
 def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplot,  
                   minpoints=8, place1='', place2='', save=False,
@@ -2382,7 +2511,7 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax11.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax11.set_ylim(0, 35)  # Set the Y-axis limits
     ax11.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax11.legend()  # Display legend
+    ax11.legend(framealpha=0.55)  # Display legend
     ax11.set_xticklabels([])
     
     ax12.set_title(labels[1])  # Setting the title for the first subplot
@@ -2394,7 +2523,7 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax12.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax12.set_ylim(0, 35)  # Set the Y-axis limits
     ax12.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax12.legend()  # Display legend
+    ax12.legend(framealpha=0.55)  # Display legend
     ax12.set_xticklabels([])
 
     
@@ -2407,7 +2536,7 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax13.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax13.set_ylim(0, 35)  # Set the Y-axis limits
     ax13.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax13.legend()  # Display legend
+    ax13.legend(framealpha=0.55)  # Display legend
     ax13.set_xlabel('Time from start of blocking [days]')  # X-axis label
     ax13.set_xticks(np.arange(0, daystoplot+1, 2))
 
@@ -2421,7 +2550,7 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax21.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax21.set_ylim(0, 35)  # Set the Y-axis limits
     ax21.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax21.legend()  # Display legend
+    ax21.legend(framealpha=0.55)  # Display legend
     ax21.set_xticklabels([])
 
     
@@ -2434,7 +2563,7 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax22.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax22.set_ylim(0, 35)  # Set the Y-axis limits
     ax22.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax22.legend()  # Display legend
+    ax22.legend(framealpha=0.55)  # Display legend
     ax22.set_xticklabels([])
 
     
@@ -2447,7 +2576,7 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax23.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
     ax23.set_ylim(0, 35)  # Set the Y-axis limits
     ax23.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax23.legend()  # Display legend
+    ax23.legend(framealpha=0.55)  # Display legend
     ax23.set_xlabel('Time from start of blocking [days]')  # X-axis label
     ax23.set_xticks(np.arange(0, daystoplot+1, 2))
     
@@ -2463,10 +2592,12 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     
     if save=="pdf":
             plt.savefig("Figures/Meanplot_pressure.pdf")
-    if save=="png":
+    elif save=="png":
             plt.savefig("Figures/Meanplot_pressure.png", dpi=400)    
-
-    plt.show()
+    elif save == "Figure.png":
+        plt.savefig("Figures/Figure9.png", dpi=400)
+    else:
+        plt.show()
 
 
 
@@ -2554,22 +2685,22 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
         # Plot for seasons (left column)
         axes[0].plot(years, winter, label="Winter", color='b', linestyle='-', marker='o')
         axes[0].set_title("Winter")
-        axes[0].legend()
+        axes[0].legend(framealpha=0.55)
         axes[0].grid()
     
         axes[1].plot(years, spring, label="Spring", color='g', linestyle='-', marker='^')
         axes[1].set_title("Spring")
-        axes[1].legend()
+        axes[1].legend(framealpha=0.55)
         axes[1].grid()
     
         axes[2].plot(years, summer, label="Summer", color='r', linestyle='-', marker='s')
         axes[2].set_title("Summer")
-        axes[2].legend()
+        axes[2].legend(framealpha=0.55)
         axes[2].grid()
     
         axes[3].plot(years, autumn, label="Autumn", color='orange', linestyle='-', marker='d')
         axes[3].set_title("Autumn")
-        axes[3].legend()
+        axes[3].legend(framealpha=0.55)
         axes[3].grid()
     
         # Set the labels and title with improved font sizes
@@ -2587,17 +2718,17 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
         # Plot for seasons (left column)
         axes[0].plot(years, weak, label="Weak", color='b', linestyle='-', marker='o')
         axes[0].set_title("Weak")
-        axes[0].legend()
+        axes[0].legend(framealpha=0.55)
         axes[0].grid()
     
         axes[1].plot(years, medium, label="Medium", color='g', linestyle='-', marker='^')
         axes[1].set_title("Medium")
-        axes[1].legend()
+        axes[1].legend(framealpha=0.55)
         axes[1].grid()
     
         axes[2].plot(years, strong, label="Strong", color='r', linestyle='-', marker='s')
         axes[2].set_title("Strong")
-        axes[2].legend()
+        axes[2].legend(framealpha=0.55)
         axes[2].grid()
     
         # Set the labels and title with improved font sizes
@@ -2615,7 +2746,7 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
         # Plot the total blocking days
         ax.plot(years, total, label="Total", color='black', linestyle='-', marker='o')
         ax.set_title("Total Blocking Days Per Year")  # Corrected title
-        ax.legend()
+        ax.legend(framealpha=0.55)
         ax.grid(True, axis='both', linestyle='--', alpha=0.6)
   # Add grid for better visibility
         
@@ -2749,14 +2880,14 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
         ax8.set_yticks(np.arange(0, max(total), 20), minor=True)  # Set minor ticks every 20 units
         ax8.grid(True, which="both", linestyle='--', alpha=0.6) # Apply grid for both major and minor ticks
         
-        ax1.legend(loc="center left")
-        ax2.legend(loc="upper left")
-        ax3.legend(loc="upper left")
-        ax4.legend(loc="center left")
-        ax5.legend(loc="upper left")
-        ax6.legend(loc="lower left")
-        ax7.legend(loc="lower left")
-        ax8.legend(loc="lower left")
+        ax1.legend(framealpha=0.55, loc="center left")
+        ax2.legend(framealpha=0.55, loc="upper left")
+        ax3.legend(framealpha=0.55, loc="upper left")
+        ax4.legend(framealpha=0.55, loc="center left")
+        ax5.legend(framealpha=0.55, loc="upper left")
+        ax6.legend(framealpha=0.55, loc="lower left")
+        ax7.legend(framealpha=0.55, loc="lower left")
+        ax8.legend(framealpha=0.55, loc="lower left")
         
         ax1.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
         ax2.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
@@ -2783,7 +2914,7 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
                 
         #plt.suptitle("Number of Blocking Days Per Year ", fontsize=12, fontname='DejaVu Sans', x=0.5)
   
-        plt.show()
+        #plt.show()
 
      # Save the plot if needed
     if save == "pdf":
@@ -2792,7 +2923,7 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
              plt.savefig(f"Figures/blocking_days_per_year_{typ}.png", dpi=400)
         
         # Display the plot
-    plt.show()
+    #plt.show()
     
 def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
     """
@@ -2856,7 +2987,7 @@ def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
         ax.set_xticklabels(years[::3], rotation=45)  # Rotate the labels by 45 degrees
         
         plt.grid(True, axis='both', linestyle='--', alpha=0.6)
-        ax.legend()
+        ax.legend(framealpha=0.55)
         plt.tight_layout()
    
     else:
@@ -2874,6 +3005,7 @@ def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
         # Labels and title
         ax.set_xlabel('Year', fontsize=12)
         ax.set_ylabel('Number of events', fontsize=12)
+        ax.set_ylim(0, max(total_blockings)+2)
         #ax.set_title('Number of Blocking events Per Year', fontsize=14, fontname='DejaVu Sans', x=0.5)
         
         # Set x-ticks every 3 years and rotate labels
@@ -2881,17 +3013,19 @@ def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
         ax.set_xticklabels(years[::5], rotation=45)
         
         ax.grid(True, axis='both', linestyle='--', alpha=0.6)
-        ax.legend()
+        ax.legend(framealpha=0.55)
         plt.tight_layout()
-        plt.show()
+        #plt.show()
         
     if save=="pdf":
         plt.savefig("Figures/BlockingsPerYear.pdf")
-    if save=="png":
+    elif save=="png":
         plt.savefig("Figures/BlockingsPerYear.png", dpi=400)
+    elif save == "Figure.png":
+        plt.savefig("Figures/Figure10.png", dpi=400)
+    else:
+        plt.show()
         
-    plt.show()
-
 
 
 def plot_blockingsdays_by_year(block_list, save=False):
@@ -3141,20 +3275,20 @@ def plot_blockingsdays_by_year(block_list, save=False):
     ax8.grid(True, which="both", linestyle='--', alpha=0.6) # Apply grid for both major and minor ticks
         
     
-    ax1.legend(loc="upper left")
-    ax2.legend(loc="upper left")
-    ax3.legend(loc="upper left")
-    ax4.legend(loc="upper left")
+    ax1.legend(framealpha=0.55, loc="upper left")
+    ax2.legend(framealpha=0.55, loc="upper left")
+    ax3.legend(framealpha=0.55, loc="upper left")
+    ax4.legend(framealpha=0.55, loc="upper left")
     
-    ax5.legend(loc="upper left")
-    ax6.legend(loc="upper left")
-    ax7.legend(loc="upper left")
+    ax5.legend(framealpha=0.55, loc="upper left")
+    ax6.legend(framealpha=0.55, loc="upper left")
+    ax7.legend(framealpha=0.55, loc="upper left")
     
-    ax9.legend(loc="upper left")
-    ax10.legend(loc="upper left")
-    ax11.legend(loc="upper left")
-    ax12.legend(loc="upper left")
-    ax8.legend(loc="lower left")
+    ax9.legend(framealpha=0.55, loc="upper left")
+    ax10.legend(framealpha=0.55, loc="upper left")
+    ax11.legend(framealpha=0.55, loc="upper left")
+    ax12.legend(framealpha=0.55, loc="upper left")
+    ax8.legend(framealpha=0.55, loc="lower left")
         
     #ax1.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
     #ax2.set_yticks(np.arange(0, 81, 40))  # Set major ticks every 40 units
@@ -3187,13 +3321,14 @@ def plot_blockingsdays_by_year(block_list, save=False):
     #plt.suptitle("Number of Blocking Days Per Year", fontsize=12, fontname='DejaVu Sans', x=0.5, y=0.98)
     plt.subplots_adjust(left=0.06, right=0.97, top=0.92, bottom=0.06, hspace=0.25, wspace=0.10)
   
-    plt.show()
+    #plt.show()
 
      # Save the plot if needed
     if save == "pdf":
             plt.savefig(f"Figures/blocking_days_per_year.pdf")
-    if save == "png":
+    elif save == "png":
              plt.savefig(f"Figures/blocking_days_per_year.png", dpi=400)
-        
-        # Display the plot
-    plt.show()
+    elif save == "Figure.png":
+        plt.savefig("Figures/Figure11.png", dpi=400)
+    else:
+        plt.show()

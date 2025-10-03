@@ -20,8 +20,8 @@ warnings.simplefilter("ignore", category=UserWarning)
 
 plt.close('all')
 
-info   = False          #<-------- CHANGE IF YOU WANT
-imsave = "png"         # Can be pdf, png, False
+info   = False         #<-------- CHANGE IF YOU WANT
+imsave = "Figure.png"         # Can be 'pdf', 'png', 'Figure.png' or False
 
 press_lim   = 1014   # This is the pressure limit for classifying high pressure
 dur_lim     = 5      # Minimum number of days for blocking
@@ -103,21 +103,20 @@ blocking_list_Malmö, blocking_list_Vavihill = read.date_calibrate_blockinglists
                                                 timediff, info=info)
 
 
-read.plot_period(PM_data_Vavihill, wind_data_Vavihill, rain_data_Vavihill, 
-                 pressure_data, blocking_list_Vavihill,
-                 start_time='2022-01-01', 
-                 end_time='2022-12-31',
-                 wind_plot=False,
-                 locationsave="Vavihill",
-                 save=imsave)
+read.plot_period_both(PM_data_1=PM_data_Vavihill,
+                    rain_data_1=rain_data_Vavihill,
+                    pressure_data=pressure_data,
+                    blocking_list_1=blocking_list_Vavihill,
+                    location1="Vavihill",
 
-read.plot_period(PM_data_Malmö, wind_data_Malmö, rain_data_Malmö, 
-                 pressure_data, blocking_list_Malmö,
-                 start_time='2022-01-01', 
-                 end_time='2022-12-31',
-                 wind_plot=False,
-                 locationsave="Malmö",
-                 save=imsave)
+                    PM_data_2=PM_data_Malmö,
+                    rain_data_2=rain_data_Malmö,
+                    blocking_list_2=blocking_list_Malmö,
+                    location2="Malmö",
+
+                    start_time="2022-01-01",
+                    end_time="2022-12-31",
+                    save=imsave)
 
 if not info: print('2. The period plots are done')
 
@@ -140,8 +139,6 @@ totdata_list_Vavihill, totdata_list_dates_Vavihill = read.array_blocking_list(
 
 block_datafile_Vavihill = pd.concat(blocking_list_Vavihill, ignore_index=True)
 PM_without_blocking_Vavihill = PM_data_Vavihill[~PM_data_Vavihill['datetime_start'].isin(block_datafile_Vavihill['datetime'])]
-
-
 
 pm_mean_Vavihill= np.nanmean(np.array(PM_without_blocking_Vavihill['pm2.5']))
 pm_sigma_Vavihill = np.nanstd(np.array(PM_without_blocking_Vavihill['pm2.5']))
@@ -248,6 +245,7 @@ read.plot_seasonal_mean(seasonal_totdata_list1=seasonal_totdata_list_Vavihill,
                    no_blocking_data2=seasonal_grey_area2,
                    minpoints=8,
                    place1='Vavihill', place2='Malmö', save=imsave)
+
 if not info: print('3. The mean plots are now done')
 
 if imsave: plt.close('all')

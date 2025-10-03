@@ -21,17 +21,17 @@ warnings.simplefilter("ignore", category=UserWarning)
 plt.close('all')
 
 info   = False         #<-------- CHANGE IF YOU WANT
-imsave = "Figure.png"         # Can be 'pdf', 'png', 'Figure.png' or False
+imsave = "Figure.png"  # Can be 'pdf', 'png', 'Figure.png' or False
 
 press_lim   = 1014   # This is the pressure limit for classifying high pressure
 dur_lim     = 5      # Minimum number of days for blocking
-rain_lim    = 0.5    # Horly max rain rate
+rain_lim    = 0.5    # Hourly max rain rate
 event_limit = 5      # Second rain filter for entire rain period
 daily_limit = 1      # Daily max rain rate (Ängelholm)
-mindatasets = 8      # Minimum allowed of dattsets allowed when taking std and mean
+mindatasets = 8      # Minimum allowed of datasets allowed when taking std and mean
 daystoplot  = 14     # How long periods should the plots display
-pm_coverege = 0.85   # How much PM2.5 coverge must the periods have
-timediff    = '5 hours' # This determines how far away two differnet events can be 
+pm_coverege = 0.85   # How much PM2.5 coverage must the periods have
+timediff    = '5 hours' # This determines how far away two different events can be 
 
 
 start_time = time.time()
@@ -61,7 +61,7 @@ read.plot_blockingsdays_by_year(blocking_list, save=imsave)
 if not info: print('1. The frequency plots are done')
 
 
-###########################################################
+###############################################################################
 
 """
 Here we make the period plot
@@ -121,7 +121,7 @@ read.plot_period_both(PM_data_1=PM_data_Vavihill,
 if not info: print('2. The period plots are done')
 
 
-##############################################################################
+###############################################################################
 
 
 """
@@ -248,7 +248,6 @@ read.plot_seasonal_mean(seasonal_totdata_list1=seasonal_totdata_list_Vavihill,
 
 if not info: print('3. The mean plots are now done')
 
-if imsave: plt.close('all')
     
 if not info: print(f"Elapsed time: {time.time() - start_time:.0f} seconds")
 

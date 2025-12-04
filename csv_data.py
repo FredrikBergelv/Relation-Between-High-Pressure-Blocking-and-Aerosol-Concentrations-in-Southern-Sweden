@@ -76,14 +76,9 @@ pres_data = pres_data.sort_values(by='datetime', ascending=False).drop_duplicate
 # Read Rain Data
 Hörby_rain_data = read.get_rain_data(data["rain"]["Hörby"])
 
-
-# Read Rain Data
-Hörby_rain_data = read.get_rain_data(data["rain"]["Hörby"])
-
-
 Ängelholm_rain_data = read.get_daily_rain_data(data["dailyrain"]["Ängelholm"])
 Tånga_rain_data = read.get_daily_rain_data(data["dailyrain"]["Tånga"])
-rain_data = pd.concat([Ängelholm_rain_data,Hörby_rain_data], axis=0)
+rain_data = pd.concat([Ängelholm_rain_data,Tånga_rain_data], axis=0)
 rain_data = rain_data.sort_values(by='datetime', ascending=False).drop_duplicates(
     subset=['datetime'], keep='first'
 ).sort_values(by='datetime').reset_index(drop=True)  # Reset index
@@ -115,4 +110,5 @@ histogram_main = {
     "pressure": pres_data,
     "rain": rain_data,
     "wind": Ängelholm_wind_data}
+
 

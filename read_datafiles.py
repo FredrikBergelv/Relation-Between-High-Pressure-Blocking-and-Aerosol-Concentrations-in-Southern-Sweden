@@ -403,7 +403,7 @@ def find_blocking(pres_data, rain_data, pressure_limit, duration_limit,
     data = data.dropna(subset=['rain'])
     
     # Identify high pressure & low rain hours
-    data['highp'] = (data['pressure'] > pressure_limit) & (data['rain'] < rain_limit)
+    data['highp'] = (data['pressure'] >= pressure_limit) & (data['rain'] <= rain_limit)
     
     # Assign streak IDs to contiguous high pressure periods
     data['streak_id'] = (data['highp'] != data['highp'].shift()).cumsum()
@@ -657,7 +657,7 @@ def array_extra_period(PM_data, wind_data, temp_data, rain_data, pressure_data,
             
         # Plot PM2.5
         axs[1].plot(time, pm25, label='PM2.5', color='green')
-        axs[1].set_ylabel('PM$_{{2.5}}$ (µg/m³)')
+        axs[1].set_ylabel('PM2.5 (µg/m³)')
         axs[1].legend(framealpha=0.55)
         axs[1].set_ylim(0,60)
         axs[1].grid(True, axis='both', linestyle='--', alpha=0.6)
@@ -840,7 +840,7 @@ def plot_blocking_array(array, array_title=False, extrainfo=True, save=False):
         
         # Plot PM2.5
         axs[1].plot(time, pm25, label='PM2.5', color='green')
-        axs[1].set_ylabel('PM$_{{2.5}}$ [µg/m³]')
+        axs[1].set_ylabel('PM2.5 [µg/m³]')
         axs[1].legend(framealpha=0.55)
         axs[1].set_ylim(0,60)
         axs[1].grid(True, axis='both', linestyle='--', alpha=0.6)
@@ -860,7 +860,7 @@ def plot_blocking_array(array, array_title=False, extrainfo=True, save=False):
         
         # Plot PM2.5
         axs[1].plot(time, pm25, label='PM2.5', color='green')
-        axs[1].set_ylabel('PM$_{{2.5}}$ [µg/m³]')
+        axs[1].set_ylabel('PM2.5 [µg/m³]')
         axs[1].legend(framealpha=0.55)
         axs[1].set_ylim(0,60)
         axs[1].grid(True, axis='both', linestyle='--', alpha=0.6)
@@ -978,7 +978,7 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
 
     # Plot PM2.5
     axs[0].plot(merged_data['datetime'], merged_data['pm2.5'], label=f'PM2.5, {locationsave}', color='green')
-    axs[0].set_ylabel('PM$_{{2.5}}$ [µg/m³]')
+    axs[0].set_ylabel('PM2.5 [µg/m³]')
     axs[0].set_ylim(0, 60)
     axs[0].legend(framealpha=0.55, loc='upper center')
     axs[0].grid(True, axis='both', linestyle='--', alpha=0.6)
@@ -1030,7 +1030,9 @@ def plot_period(PM_data, wind_data, rain_data, pressure_data,
           
 def plot_period_both(PM_data_1, rain_data_1, pressure_data, blocking_list_1, location1,
                      PM_data_2, rain_data_2, blocking_list_2, location2,
-                     start_time, end_time, save=False):
+                     start_time, end_time, 
+                     wind_data_1=False, wind_data_2=False,
+                     save=False):
     """
     Plot PM2.5, air pressure, and rainfall for two locations side by side
     with panel labels (a–f).
@@ -1062,13 +1064,33 @@ def plot_period_both(PM_data_1, rain_data_1, pressure_data, blocking_list_1, loc
                 .merge(rain_data_2, on='datetime', how='outer')
                 .sort_values(by='datetime')
                 .reset_index(drop=True))
+    
+    if isinstance(wind_data_1, pd.DataFrame) and not wind_data_1.empty:
+        wind_data_1 = wind_data_1[(wind_data_1['datetime'] >= start_time) & (wind_data_1['datetime'] <= end_time)]
+        wind_data_2 = wind_data_2[(wind_data_2['datetime'] >= start_time) & (wind_data_2['datetime'] <= end_time)]
+
+        merged_1 = (pressure_data_1
+                    .merge(PM_data_1, on='datetime', how='outer')
+                    .merge(wind_data_1, on='datetime', how='outer')
+                    .merge(rain_data_1, on='datetime', how='outer')
+                    .sort_values(by='datetime')
+                    .reset_index(drop=True))
+        merged_2 = (pressure_data_2
+                    .merge(PM_data_2, on='datetime', how='outer')
+                    .merge(wind_data_2, on='datetime', how='outer')
+                    .merge(rain_data_2, on='datetime', how='outer')
+                    .sort_values(by='datetime')
+                    .reset_index(drop=True))
+      
 
     #  Blocking periods 
     periods_1 = [(min(df['datetime']), max(df['datetime'])) for df in blocking_list_1]
     periods_2 = [(min(df['datetime']), max(df['datetime'])) for df in blocking_list_2]
 
-    #  Create figure 
-    fig, axes = plt.subplots(3, 2, figsize=(10, 6), sharex=True)
+    if isinstance(wind_data_1, pd.DataFrame) and not wind_data_1.empty:
+        fig, axes = plt.subplots(4, 2, figsize=(10, 8), sharex=True)
+    else:
+        fig, axes = plt.subplots(3, 2, figsize=(10, 6), sharex=True)
 
     #  LEFT PLOT
     axes[0,0].plot(merged_1['datetime'], merged_1['pm2.5'], color='green', label=f'PM2.5, Vavihill')
@@ -1084,9 +1106,19 @@ def plot_period_both(PM_data_1, rain_data_1, pressure_data, blocking_list_1, loc
 
     axes[2,0].plot(merged_1['datetime'], merged_1['rain'], color='blue', label=f'Pecipitation, Hörby')
     axes[2,0].set_ylabel('Rainfall [mm]')
-    axes[2,0].set_xlabel('Date')
     axes[2,0].legend(framealpha=0.55, loc='upper left')
     axes[2,0].grid(True, linestyle='--', alpha=0.6)
+    
+    if not isinstance(wind_data_1, pd.DataFrame) or wind_data_1.empty:
+        axes[2,0].set_xlabel('Date')
+    
+    if isinstance(wind_data_1, pd.DataFrame) and not wind_data_1.empty:
+
+        axes[3,0].plot(merged_1['datetime'], merged_1['speed'], color='orange', label=f'Wind speed, Hörby')
+        axes[3,0].set_ylabel('Wind speed [m/s]')
+        axes[3,0].set_xlabel('Date')
+        axes[3,0].legend(framealpha=0.55, loc='upper left')
+        axes[3,0].grid(True, linestyle='--', alpha=0.6)
 
     for ax in axes[:,0]:
         for start, end in periods_1:
@@ -1116,9 +1148,19 @@ def plot_period_both(PM_data_1, rain_data_1, pressure_data, blocking_list_1, loc
 
     axes[2,1].plot(merged_2['datetime'], merged_2['rain'], color='blue', label=f'Pecipitation, Malmö')
     axes[2,1].set_ylabel('Rainfall [mm]')
-    axes[2,1].set_xlabel('Date')
     axes[2,1].legend(framealpha=0.55, loc='upper left')
     axes[2,1].grid(True, linestyle='--', alpha=0.6)
+    
+    if not isinstance(wind_data_1, pd.DataFrame) or wind_data_1.empty:
+        axes[2,1].set_xlabel('Date')
+
+    
+    if isinstance(wind_data_1, pd.DataFrame) and not wind_data_1.empty:
+        axes[3,1].plot(merged_2['datetime'], merged_2['speed'], color='orange', label=f'Wind speed, Malmö')
+        axes[3,1].set_ylabel('Wind speed [m/s]')
+        axes[3,1].set_xlabel('Date')
+        axes[3,1].legend(framealpha=0.55, loc='upper left')
+        axes[3,1].grid(True, linestyle='--', alpha=0.6)
     
 
     for ax in axes[:,1]:
@@ -1134,6 +1176,13 @@ def plot_period_both(PM_data_1, rain_data_1, pressure_data, blocking_list_1, loc
                    fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
     axes[2,1].text(0.95, 0.95, "(f)", transform=axes[2,1].transAxes,
                    fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+    
+    if isinstance(wind_data_1, pd.DataFrame) and not wind_data_1.empty:
+        axes[3,0].text(0.95, 0.95, "(h)", transform=axes[3,0].transAxes,
+                       fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+        axes[3,1].text(0.95, 0.95, "(h)", transform=axes[3,1].transAxes,
+                       fontsize=12, fontname='DejaVu Sans', ha='right', va='top')
+
 
     plt.tight_layout()
 
@@ -1142,7 +1191,7 @@ def plot_period_both(PM_data_1, rain_data_1, pressure_data, blocking_list_1, loc
     elif save == "pdf":
         plt.savefig(f"Figures/{location1}_{location2}_plot_{start_time.strftime('%Y%m%d')}_{end_time.strftime('%Y%m%d')}.pdf")
     elif save == "Figure.png":
-        plt.savefig("Figures/Figure4.png", dpi=400)
+        plt.savefig("Figures/Figure3.png", dpi=400)
     else:
         plt.show()
 
@@ -1243,8 +1292,9 @@ def sort_wind_dir(totdata_list, upperlim=False, lowerlim=False, pie=False, save=
         
     # Print Summary
     if pieinfo:
-        print(f'{round(100 * partNE,1)}\% of the winds came from the Northeast (310° to 70°), {round(100 * partSE,1)}\% from the Southeast (70° to 190°), {round(100 * partW,1)}\% from the West (190° to 310°) and {round(100 * partTurning,1)}\% from no specific direction.')        
-        
+        #print(f'{round(100 * partNE,1)}\% of the winds came from the Northeast (310° to 70°), {round(100 * partSE,1)}\% from the Southeast (70° to 190°), {round(100 * partW,1)}\% from the West (190° to 310°) and {round(100 * partTurning,1)}\% from no specific direction.')        
+        print(f'{round(100 * partNE,1)}% of the winds came from the north-east, {round(100 * partSE,1)}% from the sout-heast, {round(100 * partW,1)}% from the west and {round(100 * partTurning,1)}\% from the mixed direction.')        
+
     
     if upperlim:
         return personalized_totdata_list
@@ -1327,13 +1377,13 @@ def sort_season(totdata_list, totdata_list_dates, pie=False, save=False,
         
     # Print Summary
     if pieinfo:
-        print(f'{round(100 * partWinter,1)}\% of the blocking events occurred during the winter, {round(100 * partSpring,1)}\% during the spring, {round(100 * partSummer,1)}\% during the summer and {round(100 * partAutumn,1)}\% during the autumn.')        
+        print(f'{round(100 * partWinter,1)}% of the blocking events occurred during the winter, {round(100 * partSpring,1)}% during the spring, {round(100 * partSummer,1)}% during the summer and {round(100 * partAutumn,1)}% during the autumn.')        
     if uppermonthlim is not False and lowermonthlim is not False:
         return personalized_totdata_list
 
     return winter_totdata_list,spring_totdata_list, summer_totdata_list, autumn_totdata_list
 
-def sort_pressure(totdata_list, pie=False, save=False, pieinfo=False, limits=[1020, 1025]):
+def sort_pressure(totdata_list, pie=False, save=False, pieinfo=False, limits=[1020, 1026]):
     """This function sorts the list of arrays into three blocking categories based on mean pressure."""
     
     low_totdata_list = []
@@ -1386,7 +1436,7 @@ def sort_pressure(totdata_list, pie=False, save=False, pieinfo=False, limits=[10
         
     # Print summary in a single line with explicit pressure thresholds
     if pieinfo:
-        print(f'{round(100 * partLow,1)}\% of the blocking events occurred with a mean pressure below {limits[0]} hPa {round(100 * partMedium,1)}\% occurred between {limits[0]} and {limits[1]} hPa and {round(100 * partHigh,1)}\% occurred with a mean pressure over {limits[1]}hPa.')
+        print(f'{round(100 * partLow,1)}% of the blocking events occurred with a mean pressure below {limits[0]} hPa {round(100 * partMedium,1)}% occurred between {limits[0]} and {limits[1]} hPa and {round(100 * partHigh,1)}% occurred with a mean pressure over {limits[1]}hPa.')
 
 
     return low_totdata_list, medium_totdata_list, high_totdata_list
@@ -1400,7 +1450,7 @@ pressure blocking.
 def plot_mean(totdata_list1, totdata_list2, 
               daystoplot, minpoints=8, place1='', place2='',
               pm_mean1=False, pm_sigma1=False, pm_mean2=False, pm_sigma2=False,
-              save=False):
+              EU_limVal=25, save=False):
     """
     This function takes the mean of the PM2.5 concentration for each hour.
     You must specify how many days you wish to plot, you can add a wind title, 
@@ -1434,7 +1484,7 @@ def plot_mean(totdata_list1, totdata_list2,
     
     #create subfgure
     fig = plt.figure(figsize=(9, 6), constrained_layout=True)  
-    #fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$', fontsize=13, fontname='DejaVu Sans', x=0.5,)
+    #fig.suptitle(r'Mean Concentration of PM2.5', fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(2, 2, height_ratios=[1.4, 1])  # Top row is twice as tall
     
     # Create subplots using GridSpec
@@ -1482,10 +1532,10 @@ def plot_mean(totdata_list1, totdata_list2,
     ax1.plot(t, pm_mean1 + t * 0, label='Mean during no blocking', c='gray')
     ax1.fill_between(t, pm_mean1 + t * 0 + pm_sigma1, pm_mean1 + t * 0 - pm_sigma1, alpha=0.4, color='gray') 
     ax1.fill_between(t, mean1 + sigma1, mean1 - sigma1, alpha=0.4, color='C0')
-    ax1.plot(t, t * 0 + 25, label='EU annual mean limit value', c='r', linestyle='--')
+    ax1.plot(t, t * 0 + EU_limVal, label='EU annual mean limit value', c='r', linestyle='--')
     ax1.set_xlabel('Time from start of blocking [days]')
     ax1.set_ylabel('PM2.5 [µg/m³]')
-    ax1.set_ylim(0, 44)
+    ax1.set_ylim(0, 36)
     ax1.grid(True, axis='both', linestyle='--', alpha=0.6)
     ax1.legend(framealpha=0.55)
     
@@ -1496,13 +1546,13 @@ def plot_mean(totdata_list1, totdata_list2,
             sigma2[i] = np.nan
     
     ax2.plot(t, mean2, label=f'{place2}, $\\tau$={tau2}, sen-slope={slope2}', c='C0')
-    ax2.plot(t, t * 0 + 25, c='r', linestyle='--')
+    ax2.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')
     ax2.plot(t, pm_mean2 + t * 0, c='gray')
     ax2.fill_between(t, pm_mean2 + t * 0 + pm_sigma2, pm_mean2 + t * 0 - pm_sigma2, alpha=0.4, color='gray')
     ax2.fill_between(t, mean2 + sigma2, mean2 - sigma2, alpha=0.4, color='C0')
     ax2.set_xlabel('Time from start of blocking [days]')
-    ax2.set_ylabel('PM$_{{2.5}}$ [µg/m³]')
-    ax2.set_ylim(0, 44)
+    ax2.set_ylabel('PM2.5 [µg/m³]')
+    ax2.set_ylim(0, 36)
     ax2.grid(True, axis='both', linestyle='--', alpha=0.6)
     ax2.legend(framealpha=0.55)
 
@@ -1543,7 +1593,7 @@ def plot_mean(totdata_list1, totdata_list2,
     elif save=="png":
         plt.savefig("Figures/Meanplot.png", dpi=400)
     elif save == "Figure.png":
-        plt.savefig("Figures/Figure5.png", dpi=400)
+        plt.savefig("Figures/Figure4.png", dpi=400)
     else:
         plt.show()
         
@@ -1551,7 +1601,7 @@ def plot_mean(totdata_list1, totdata_list2,
 def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
                     daystoplot, minpoints=8, place1='', place2='',
                     pm_mean1=False, pm_sigma1=False, pm_mean2=False, pm_sigma2=False,
-                    save=False):
+                    EU_limVal=25, save=False):
     """
     Plot mean and std PM2.5 concentrations starting from the END of each blocking event,
     forward for `days_after` days, ensuring hourly continuity even if data is missing.
@@ -1600,7 +1650,7 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     
     #create subfgure
     fig = plt.figure(figsize=(9, 3.3), constrained_layout=True)  
-    #fig.suptitle(r'Mean concentration of PM$_{{2.5}}$ After End of Event',  fontsize=13, fontname='DejaVu Sans', x=0.5,)
+    #fig.suptitle(r'Mean concentration of PM2.5 After End of Event',  fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(1, 2)  # Top row is twice as tall
     
     # Create subplots using GridSpec
@@ -1628,10 +1678,10 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     ax1.plot(t_after, pm_mean1 + t_after * 0, label='Mean during no blocking', c='gray')
     ax1.fill_between(t_after, pm_mean1 + t_after * 0 + pm_sigma1, pm_mean1 + t_after * 0 - pm_sigma1, alpha=0.4, color='gray') 
     ax1.fill_between(t_after, mean_after1 + sigma_after1, mean_after1 - sigma_after1, alpha=0.4, color='C1')
-    ax1.plot(t_after, t_after * 0 + 25, label='EU annual mean limit value', c='r', linestyle='--')
+    ax1.plot(t_after, t_after * 0 + EU_limVal, label='EU annual mean limit value', c='r', linestyle='--')
     ax1.set_xlabel('Time from end of blocking [days]')
     ax1.set_ylabel('PM2.5 [µg/m³]')
-    ax1.set_ylim(0, 44)
+    ax1.set_ylim(0, 36)
     ax1.grid(True, axis='both', linestyle='--', alpha=0.6)
     ax1.legend(framealpha=0.55, loc='upper left')
     
@@ -1639,10 +1689,10 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     ax2.plot(t_after, pm_mean2 + t_after * 0, c='gray')
     ax2.fill_between(t_after, pm_mean2 + t_after * 0 + pm_sigma2, pm_mean2 + t_after * 0 - pm_sigma2, alpha=0.4, color='gray') 
     ax2.fill_between(t_after, mean_after2 + sigma_after2, mean_after2 - sigma_after2, alpha=0.4, color='C1')
-    ax2.plot(t_after, t_after * 0 + 25, c='r', linestyle='--')
+    ax2.plot(t_after, t_after * 0 + EU_limVal, c='r', linestyle='--')
     ax2.set_xlabel('Time from end of blocking [days]')
     ax2.set_ylabel('PM2.5 [µg/m³]')
-    ax2.set_ylim(0, 44)
+    ax2.set_ylim(0, 36)
     ax2.grid(True, axis='both', linestyle='--', alpha=0.6)
     ax2.legend(framealpha=0.55, loc='upper left')
     
@@ -1656,7 +1706,7 @@ def plot_mean_after(pm_data1, blocking_list1, pm_data2, blocking_list2,
     elif save=="png":
         plt.savefig("Figures/Meanplot_after.png", dpi=400)
     elif save == "Figure.png":
-        plt.savefig("Figures/Figure6.png", dpi=400)
+        plt.savefig("Figures/Figure5.png", dpi=400)
     else:
         plt.show()     
     
@@ -1664,7 +1714,7 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
                       pm_data1, blocking_list1, pm_data2, blocking_list2,
                       daystoplot, minpoints=8, place1='', place2='',
                       pm_mean1=False, pm_sigma1=False, pm_mean2=False, pm_sigma2=False,
-                      save=False):
+                      EU_limVal=25, save=False):
     """
     This function takes the mean of the PM2.5 concentration for each hour.
     You must specify how many days you wish to plot, you can add a wind title, 
@@ -1739,14 +1789,11 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
         if k==1:
             mean_after2 = mean_pm 
             sigma_after2 = std_pm
-
-   
-    
     
     
     #create subfgure
     fig = plt.figure(figsize=(9, 9), constrained_layout=True)  
-    fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$',
+    fig.suptitle(r'Mean Concentration of PM2.5',
                  fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(3, 2, height_ratios=[1.4, 1, 1])  # Top row is twice as tall
     
@@ -1779,10 +1826,10 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     ax1.plot(t, pm_mean1 + t * 0, label='Mean during no blocking', c='gray')
     ax1.fill_between(t, pm_mean1 + t * 0 + pm_sigma1, pm_mean1 + t * 0 - pm_sigma1, alpha=0.4, color='gray') 
     ax1.fill_between(t, mean1 + sigma1, mean1 - sigma1, alpha=0.4, color='C0')
-    ax1.plot(t, t * 0 + 25, label='EU annual mean limit value', c='r', linestyle='--')
+    ax1.plot(t, t * 0 + EU_limVal, label='EU annual mean limit value', c='r', linestyle='--')
     ax1.set_xlabel('Time from start of blocking [days]')
     ax1.set_ylabel('PM2.5 [µg/m³]')
-    ax1.set_ylim(0, 44)
+    ax1.set_ylim(0, 36)
     ax1.grid(True, axis='both', linestyle='--', alpha=0.6)
     ax1.legend(framealpha=0.55)
     
@@ -1793,13 +1840,13 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
             sigma2[i] = np.nan
     
     ax2.plot(t, mean2, label=f'{place2}, $\\tau$={tau2}, sen-slope={slope2:.1e}', c='C0')
-    ax2.plot(t, t * 0 + 25, c='r', linestyle='--')
+    ax2.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')
     ax2.plot(t, pm_mean2 + t * 0, c='gray')
     ax2.fill_between(t, pm_mean2 + t * 0 + pm_sigma2, pm_mean2 + t * 0 - pm_sigma2, alpha=0.4, color='gray')
     ax2.fill_between(t, mean2 + sigma2, mean2 - sigma2, alpha=0.4, color='C0')
     ax2.set_xlabel('Time from start of blocking [days]')
-    ax2.set_ylabel('PM$_{{2.5}}$ [µg/m³]')
-    ax2.set_ylim(0, 44)
+    ax2.set_ylabel('PM2.5 [µg/m³]')
+    ax2.set_ylim(0, 36)
     ax2.grid(True, axis='both', linestyle='--', alpha=0.6)
     ax2.legend(framealpha=0.55)
 
@@ -1832,10 +1879,10 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     ax5.plot(t_after, pm_mean1 + t_after * 0, c='gray')
     ax5.fill_between(t_after, pm_mean1 + t_after * 0 + pm_sigma1, pm_mean1 + t_after * 0 - pm_sigma1, alpha=0.4, color='gray') 
     ax5.fill_between(t_after, mean_after1 + sigma_after1, mean_after1 - sigma_after1, alpha=0.4, color='C2')
-    ax5.plot(t_after, t_after * 0 + 25, label='EU annual mean limit value', c='r', linestyle='--')
+    ax5.plot(t_after, t_after * 0 + EU_limVal, label='EU annual mean limit value', c='r', linestyle='--')
     ax5.set_xlabel('Time from end of blocking [days]')
     ax5.set_ylabel('PM2.5 [µg/m³]')
-    ax5.set_ylim(0, 44)
+    ax5.set_ylim(0, 36)
     ax5.grid(True, axis='both', linestyle='--', alpha=0.6)
     ax5.legend(framealpha=0.55)
     
@@ -1843,10 +1890,10 @@ def plot_mean_w_after(totdata_list1, totdata_list2,
     ax6.plot(t_after, pm_mean1 + t_after * 0, c='gray')
     ax6.fill_between(t_after, pm_mean1 + t_after * 0 + pm_sigma1, pm_mean1 + t_after * 0 - pm_sigma1, alpha=0.4, color='gray') 
     ax6.fill_between(t_after, mean_after1 + sigma_after1, mean_after1 - sigma_after1, alpha=0.4, color='C2')
-    ax6.plot(t_after, t_after * 0 + 25, label='EU annual mean limit value', c='r', linestyle='--')
+    ax6.plot(t_after, t_after * 0 + EU_limVal, label='EU annual mean limit value', c='r', linestyle='--')
     ax6.set_xlabel('Time from end of blocking [days]')
     ax6.set_ylabel('PM2.5 [µg/m³]')
-    ax6.set_ylim(0, 44)
+    ax6.set_ylim(0, 36)
     ax6.grid(True, axis='both', linestyle='--', alpha=0.6)
     ax6.legend(framealpha=0.55)
     
@@ -1917,7 +1964,7 @@ def sigma_dir_mean(blocking_list1, PM_data1, wind_data1, sort=0.5):
 
 def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot, 
                   no_blocking_data1, no_blocking_data2,
-                  minpoints=8, place1='', place2='', save=False, info=False,
+                  minpoints=8, place1='', place2='', EU_limVal=25, save=False, info=False,
                   labels=["NE (310° to 70°)", "SE (70° to 190°)", "W (190° to 310°)", "Mixed"]):
     
     """
@@ -1928,11 +1975,10 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     timelen = int(24 * daystoplot) 
     colors = ["royalblue", "tomato", "seagreen", "gold", "orange"]  # Colors mapped to NE, SE, W, Turning, non
 
-    lenmax = dir_totdata_list1[0]+dir_totdata_list1[1]+dir_totdata_list1[2]+dir_totdata_list1[3]
-    # Create an array to store all the PM2.5 values
-    PM_array1 = [np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan)]
-    PM_array2 = [np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan)]
-
+    # Create arrays to store PM2.5 values per wind direction
+    PM_array1 = [np.full((len(totodatatlist), timelen), np.nan) for totodatatlist in dir_totdata_list1]
+    PM_array2 = [np.full((len(totodatatlist), timelen), np.nan) for totodatatlist in dir_totdata_list2]
+    
     # Populate the PM_array with data
     for k, totodatatlist in enumerate(dir_totdata_list1):
         for i, array in enumerate(totodatatlist):
@@ -1971,7 +2017,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     #create subfgure
     scalingfactor = 1.1
     fig = plt.figure(figsize=(9*scalingfactor, 8.5*scalingfactor), constrained_layout=True)  
-    #fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$', fontsize=13, fontname='DejaVu Sans', x=0.5,)
+    #fig.suptitle(r'Mean Concentration of PM2.5', fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(4, 2, height_ratios=[1, 1, 1, 1])  
     
     # Create subplots using GridSpec
@@ -2003,6 +2049,15 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     tau22, slope22 = safe_mk(mean2[1])
     tau23, slope23 = safe_mk(mean2[2])
     tau24, slope24 = safe_mk(mean2[3])
+    
+    """
+    # If we want max tau values
+    vals = mean1[1]
+    imax = np.nanargmax(vals)      # index of highest value
+    vals_cut = vals[:imax+1]
+    tauu, slope = safe_mk(vals_cut)
+    print(tauu, imax, vals_cut[-1])
+    """
 
     if info:
         first_nine_days = mean1[2][:9*24]
@@ -2056,9 +2111,9 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax11.fill_between(t, no_blocking_data1['NE']['mean'] + t * 0 + no_blocking_data1['NE']['sigma'], 
                      no_blocking_data1['NE']['mean'] + t * 0 - no_blocking_data1['NE']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax11.fill_between(t, mean1[0] + sigma1[0], mean1[0] - sigma1[0], alpha=0.4, color=colors[0])  # Confidence interval for place1
-    ax11.plot(t, t * 0 + 25, label='EU annual mean limit value', c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax11.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax11.set_ylim(0, 45)  # Set the Y-axis limits
+    ax11.plot(t, t * 0 + EU_limVal, label='EU annual mean limit value', c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax11.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax11.set_ylim(0, 36)  # Set the Y-axis limits
     ax11.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax11.legend(framealpha=0.55)  # Display legend
     ax11.set_xticklabels([])
@@ -2069,9 +2124,9 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax12.fill_between(t, no_blocking_data1['SE']['mean'] + t * 0 + no_blocking_data1['SE']['sigma'], 
                       no_blocking_data1['SE']['mean'] + t * 0 - no_blocking_data1['SE']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax12.fill_between(t, mean1[1] + sigma1[1], mean1[1] - sigma1[1], alpha=0.4, color=colors[1])  # Confidence interval for place1
-    ax12.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax12.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax12.set_ylim(0, 45)  # Set the Y-axis limits
+    ax12.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax12.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax12.set_ylim(0, 36)  # Set the Y-axis limits
     ax12.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax12.legend(framealpha=0.55)  # Display legend
     ax12.set_xticklabels([])
@@ -2083,9 +2138,9 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax13.fill_between(t, no_blocking_data1['W']['mean']+ t * 0 + no_blocking_data1['W']['sigma'], 
                       no_blocking_data1['W']['mean']+ t * 0 - no_blocking_data1['W']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax13.fill_between(t, mean1[2] + sigma1[2], mean1[2] - sigma1[2], alpha=0.4, color=colors[2])  # Confidence interval for place1
-    ax13.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax13.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax13.set_ylim(0, 45)  # Set the Y-axis limits
+    ax13.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax13.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax13.set_ylim(0, 36)  # Set the Y-axis limits
     ax13.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax13.legend(framealpha=0.55)  # Display legend
     ax13.set_xticklabels([])
@@ -2097,10 +2152,10 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax14.fill_between(t, no_blocking_data1['Turning']['mean'] + t * 0 + no_blocking_data1['Turning']['sigma'], 
                       no_blocking_data1['Turning']['mean'] + t * 0 - no_blocking_data1['Turning']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax14.fill_between(t, mean1[3] + sigma1[3], mean1[3] - sigma1[3], alpha=0.4, color=colors[3])  # Confidence interval for place1
-    ax14.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax14.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
     ax14.set_xlabel('Time from start of blocking [days]')  # X-axis label
-    ax14.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax14.set_ylim(0, 45)  # Set the Y-axis limits
+    ax14.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax14.set_ylim(0, 36)  # Set the Y-axis limits
     ax14.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax14.legend(framealpha=0.55)  # Display legend
     ax14.set_xticks(np.arange(0, daystoplot+1, 2))
@@ -2112,9 +2167,9 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax21.fill_between(t, no_blocking_data2['NE']['mean'] + t * 0 + no_blocking_data2['NE']['sigma'], 
                       no_blocking_data2['NE']['mean'] + t * 0 - no_blocking_data2['NE']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax21.fill_between(t, mean2[0] + sigma2[0], mean2[0] - sigma2[0], alpha=0.4, color=colors[0])  # Confidence interval for place1
-    ax21.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax21.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax21.set_ylim(0, 45)  # Set the Y-axis limits
+    ax21.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax21.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax21.set_ylim(0, 36)  # Set the Y-axis limits
     ax21.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax21.legend(framealpha=0.55)  # Display legend
     ax21.set_xticklabels([])
@@ -2126,9 +2181,9 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax22.fill_between(t, no_blocking_data2['SE']['mean'] + t * 0 + no_blocking_data2['SE']['sigma'], 
                       no_blocking_data2['SE']['mean'] + t * 0 - no_blocking_data2['SE']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax22.fill_between(t, mean2[1] + sigma2[1], mean2[1] - sigma2[1], alpha=0.4, color=colors[1])  # Confidence interval for place1
-    ax22.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax22.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax22.set_ylim(0, 45)  # Set the Y-axis limits
+    ax22.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax22.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax22.set_ylim(0, 36)  # Set the Y-axis limits
     ax22.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax22.legend(framealpha=0.55)  # Display legend
     ax22.set_xticklabels([])
@@ -2140,11 +2195,11 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax23.fill_between(t, no_blocking_data2['W']['mean']+ t * 0 + no_blocking_data2['W']['sigma'], 
                       no_blocking_data2['W']['mean']+ t * 0 - no_blocking_data2['W']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax23.fill_between(t, mean2[2] + sigma2[2], mean2[2] - sigma2[2], alpha=0.4, color=colors[2])  # Confidence interval for place1
-    ax23.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax23.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax23.set_ylim(0, 45)  # Set the Y-axis limits
+    ax23.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax23.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax23.set_ylim(0, 36)  # Set the Y-axis limits
     ax23.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
-    ax23.legend(framealpha=0.55)  # Display legend
+    ax23.legend(framealpha=0.55, loc="upper left")  # Display legend
     ax23.set_xticklabels([])
 
     
@@ -2154,10 +2209,10 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     ax24.fill_between(t, no_blocking_data2['Turning']['mean'] + t * 0 + no_blocking_data2['Turning']['sigma'], 
                       no_blocking_data2['Turning']['mean'] + t * 0 - no_blocking_data2['Turning']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax24.fill_between(t, mean2[3] + sigma2[3], mean2[3] - sigma2[3], alpha=0.4, color=colors[3])  # Confidence interval for place1
-    ax24.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax24.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
     ax24.set_xlabel('Time from start of blocking [days]')  # X-axis label
-    ax24.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax24.set_ylim(0, 45)  # Set the Y-axis limits
+    ax24.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax24.set_ylim(0, 36)  # Set the Y-axis limits
     ax24.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax24.legend(framealpha=0.55)  # Display legend
     ax24.set_xticks(np.arange(0, daystoplot+1, 2))
@@ -2180,7 +2235,7 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     elif save=="png":
         plt.savefig("Figures/Meanplot_dir.png", dpi=400)
     elif save == "Figure.png":
-        plt.savefig("Figures/Figure7.png", dpi=400)
+        plt.savefig("Figures/Figure6.png", dpi=400)
     else:
         plt.show()
         
@@ -2228,7 +2283,7 @@ def sigma_seasonal_mean(blocking_list1, PM_data1):
 
 def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplot,
                        no_blocking_data1, no_blocking_data2, 
-                       minpoints=8, place1='', place2='', save=False,
+                       minpoints=8, place1='', place2='', EU_limVal=25, save=False,
                        labels=["Winter", "Spring", "Summer", "Autumn"]):
     """
     This function takes the mean of the PM2.5 concentration for each hour 
@@ -2282,7 +2337,7 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     #create subfgure
     scalingfactor = 1.1
     fig = plt.figure(figsize=(9*scalingfactor, 8.5*scalingfactor), constrained_layout=True)
-    #fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$', fontsize=13, fontname='DejaVu Sans', x=0.5,)
+    #fig.suptitle(r'Mean Concentration of PM2.5', fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(4, 2, height_ratios=[1, 1, 1, 1])  
         
     # Create subplots using GridSpec
@@ -2361,9 +2416,9 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax11.fill_between(t, no_blocking_data1['winter']['mean'] + t * 0 + no_blocking_data1['winter']['sigma'], 
                       no_blocking_data1['winter']['mean'] + t * 0 - no_blocking_data1['winter']['mean'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax11.fill_between(t, mean1[0] + sigma1[0], mean1[0] - sigma1[0], alpha=0.4, color=colors[0])  # Confidence interval for place1
-    ax11.plot(t, t * 0 + 25, label='EU annual mean limit value', c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax11.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax11.set_ylim(0, 45)  # Set the Y-axis limits
+    ax11.plot(t, t * 0 + EU_limVal, label='EU annual mean limit value', c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax11.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax11.set_ylim(0, 36)  # Set the Y-axis limits
     ax11.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax11.legend(framealpha=0.55)  # Display legend
     ax11.set_xticklabels([])
@@ -2374,9 +2429,9 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax12.fill_between(t, no_blocking_data1['spring']['mean'] + t * 0 + no_blocking_data1['spring']['sigma'], 
                       no_blocking_data1['spring']['mean'] + t * 0 - no_blocking_data1['spring']['mean'], alpha=0.4, color='gray')  # Confidence interval for no blocking    
     ax12.fill_between(t, mean1[1] + sigma1[1], mean1[1] - sigma1[1], alpha=0.4, color=colors[1])  # Confidence interval for place1
-    ax12.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax12.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax12.set_ylim(0, 45)  # Set the Y-axis limits
+    ax12.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax12.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax12.set_ylim(0, 36)  # Set the Y-axis limits
     ax12.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax12.legend(framealpha=0.55)  # Display legend
     ax12.set_xticklabels([])
@@ -2388,9 +2443,9 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax13.fill_between(t, no_blocking_data1['summer']['mean'] + t * 0 + no_blocking_data1['summer']['sigma'], 
                       no_blocking_data1['summer']['mean'] + t * 0 - no_blocking_data1['summer']['mean'], alpha=0.4, color='gray')  # Confidence interval for no blocking    
     ax13.fill_between(t, mean1[2] + sigma1[2], mean1[2] - sigma1[2], alpha=0.4, color=colors[2])  # Confidence interval for place1
-    ax13.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax13.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax13.set_ylim(0, 45)  # Set the Y-axis limits
+    ax13.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax13.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax13.set_ylim(0, 36)  # Set the Y-axis limits
     ax13.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax13.legend(framealpha=0.55)  # Display legend
     ax13.set_xticklabels([])
@@ -2402,10 +2457,10 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax14.fill_between(t, no_blocking_data1['autumn']['mean'] + t * 0 + no_blocking_data1['autumn']['sigma'], 
                       no_blocking_data1['autumn']['mean'] + t * 0 - no_blocking_data1['autumn']['mean'], alpha=0.4, color='gray')  # Confidence interval for no blocking    
     ax14.fill_between(t, mean1[3] + sigma1[3], mean1[3] - sigma1[3], alpha=0.4, color=colors[3])  # Confidence interval for place1
-    ax14.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax14.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
     ax14.set_xlabel('Time from start of blocking [days]')  # X-axis label
-    ax14.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax14.set_ylim(0, 45)  # Set the Y-axis limits
+    ax14.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax14.set_ylim(0, 36)  # Set the Y-axis limits
     ax14.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax14.legend(framealpha=0.55)  # Display legend
     ax14.set_xticks(np.arange(0, daystoplot+1, 2))
@@ -2417,9 +2472,9 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax21.fill_between(t, no_blocking_data2['winter']['mean'] + t * 0 + no_blocking_data2['winter']['sigma'], 
                       no_blocking_data2['winter']['mean'] + t * 0 - no_blocking_data2['winter']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax21.fill_between(t, mean2[0] + sigma2[0], mean2[0] - sigma2[0], alpha=0.4, color=colors[0])  # Confidence interval for place1
-    ax21.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax21.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax21.set_ylim(0, 45)  # Set the Y-axis limits
+    ax21.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax21.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax21.set_ylim(0, 36)  # Set the Y-axis limits
     ax21.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax21.legend(framealpha=0.55)  # Display legend
     ax21.set_xticklabels([])
@@ -2431,9 +2486,9 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax22.fill_between(t, no_blocking_data2['spring']['mean'] + t * 0 + no_blocking_data2['spring']['sigma'], 
                       no_blocking_data2['spring']['mean'] + t * 0 - no_blocking_data2['spring']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking    
     ax22.fill_between(t, mean2[1] + sigma2[1], mean2[1] - sigma2[1], alpha=0.4, color=colors[1])  # Confidence interval for place1
-    ax22.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax22.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax22.set_ylim(0, 45)  # Set the Y-axis limits
+    ax22.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax22.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax22.set_ylim(0, 36)  # Set the Y-axis limits
     ax22.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax22.legend(framealpha=0.55)  # Display legend
     ax22.set_xticklabels([])
@@ -2445,9 +2500,9 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax23.fill_between(t, no_blocking_data2['summer']['mean'] + t * 0 + no_blocking_data2['summer']['sigma'], 
                       no_blocking_data2['summer']['mean'] + t * 0 - no_blocking_data2['summer']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking    
     ax23.fill_between(t, mean2[2] + sigma2[2], mean2[2] - sigma2[2], alpha=0.4, color=colors[2])  # Confidence interval for place1
-    ax23.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax23.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax23.set_ylim(0, 45)  # Set the Y-axis limits
+    ax23.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax23.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax23.set_ylim(0, 36)  # Set the Y-axis limits
     ax23.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax23.legend(framealpha=0.55)  # Display legend
     ax23.set_xticklabels([])
@@ -2459,10 +2514,10 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     ax24.fill_between(t, no_blocking_data2['autumn']['mean'] + t * 0 + no_blocking_data2['autumn']['sigma'], 
                       no_blocking_data2['autumn']['mean'] + t * 0 - no_blocking_data2['autumn']['sigma'], alpha=0.4, color='gray')  # Confidence interval for no blocking    
     ax24.fill_between(t, mean2[3] + sigma2[3], mean2[3] - sigma2[3], alpha=0.4, color=colors[3])  # Confidence interval for place1
-    ax24.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax24.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
     ax24.set_xlabel('Time from start of blocking [days]')  # X-axis label
-    ax24.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax24.set_ylim(0, 45)  # Set the Y-axis limits
+    ax24.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax24.set_ylim(0, 36)  # Set the Y-axis limits
     ax24.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax24.legend(framealpha=0.55)  # Display legend
     ax24.set_xticks(np.arange(0, daystoplot+1, 2))
@@ -2484,13 +2539,13 @@ def plot_seasonal_mean(seasonal_totdata_list1, seasonal_totdata_list2, daystoplo
     elif save=="png":
             plt.savefig("Figures/Meanplot_seasonal.png", dpi=400)
     elif save == "Figure.png":
-        plt.savefig("Figures/Figure8.png", dpi=400)
+        plt.savefig("Figures/Figure7.png", dpi=400)
     else:
         plt.show()
             
 
 def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplot,  
-                  minpoints=8, place1='', place2='', save=False,
+                  minpoints=8, place1='', place2='', EU_limVal=25, save=False,
                   pm_mean1=False, pm_sigma1=False, pm_mean2=False, pm_sigma2=False,
                   labels=["Weaker Pressure Blocking", "Medium Pressure Blocking", "Stronger Pressure Blocking"], ):
     
@@ -2504,8 +2559,22 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
 
     lenmax = pressure_totdata_list1[0]+pressure_totdata_list1[1]+pressure_totdata_list1[2]
     # Create an array to store all the PM2.5 values
-    PM_array1 = [np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan)]
-    PM_array2 = [np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan)]
+    #PM_array1 = [np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan)]
+    #PM_array2 = [np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan), np.full((len(lenmax), timelen), np.nan)]
+
+    PM_array1 = [
+    np.full((len(pressure_totdata_list1[0]), timelen), np.nan),
+    np.full((len(pressure_totdata_list1[1]), timelen), np.nan),
+    np.full((len(pressure_totdata_list1[2]), timelen), np.nan),
+    ]
+
+    PM_array2 = [
+    np.full((len(pressure_totdata_list2[0]), timelen), np.nan),
+    np.full((len(pressure_totdata_list2[1]), timelen), np.nan),
+    np.full((len(pressure_totdata_list2[2]), timelen), np.nan),
+    ]
+
+
 
     # Populate the PM_array with data
     for k, totodatatlist in enumerate(pressure_totdata_list1):
@@ -2545,7 +2614,7 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     #create subfgure
     scalingfactor = 1.1
     fig = plt.figure(figsize=(9*scalingfactor, 8.5*4/5*scalingfactor), constrained_layout=True)  
-    #fig.suptitle(r'Mean Concentration of PM$_{{2.5}}$', fontsize=13, fontname='DejaVu Sans', x=0.5,)
+    #fig.suptitle(r'Mean Concentration of PM2.5', fontsize=13, fontname='DejaVu Sans', x=0.5,)
     gs = gridspec.GridSpec(3, 2, height_ratios=[1, 1, 1])  
     
     # Create subplots using GridSpec
@@ -2608,9 +2677,9 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax11.plot(t, pm_mean1 + t * 0, label='Mean during no blocking', c='gray')  # Plot the mean during no blocking
     ax11.fill_between(t, pm_mean1 + t * 0 + pm_sigma1, pm_mean1 + t * 0 - pm_sigma1, alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax11.fill_between(t, mean1[0] + sigma1[0], mean1[0] - sigma1[0], alpha=0.4, color=colors[0])  # Confidence interval for place1
-    ax11.plot(t, t * 0 + 25, label='EU annual mean limit value', c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax11.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax11.set_ylim(0, 45)  # Set the Y-axis limits
+    ax11.plot(t, t * 0 + EU_limVal, label='EU annual mean limit value', c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax11.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax11.set_ylim(0, 36)  # Set the Y-axis limits
     ax11.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax11.legend(framealpha=0.55)  # Display legend
     ax11.set_xticklabels([])
@@ -2620,9 +2689,9 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax12.plot(t, pm_mean1 + t * 0, c='gray')  # Plot the mean during no blocking
     ax12.fill_between(t, pm_mean1 + t * 0 + pm_sigma1, pm_mean1 + t * 0 - pm_sigma1, alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax12.fill_between(t, mean1[1] + sigma1[1], mean1[1] - sigma1[1], alpha=0.4, color=colors[1])  # Confidence interval for place1
-    ax12.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax12.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax12.set_ylim(0, 45)  # Set the Y-axis limits
+    ax12.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax12.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax12.set_ylim(0, 36)  # Set the Y-axis limits
     ax12.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax12.legend(framealpha=0.55)  # Display legend
     ax12.set_xticklabels([])
@@ -2633,9 +2702,9 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax13.plot(t, pm_mean1 + t * 0, c='gray')  # Plot the mean during no blocking
     ax13.fill_between(t, pm_mean1 + t * 0 + pm_sigma1, pm_mean1 + t * 0 - pm_sigma1, alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax13.fill_between(t, mean1[2] + sigma1[2], mean1[2] - sigma1[2], alpha=0.4, color=colors[2])  # Confidence interval for place1
-    ax13.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax13.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax13.set_ylim(0, 45)  # Set the Y-axis limits
+    ax13.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax13.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax13.set_ylim(0, 36)  # Set the Y-axis limits
     ax13.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax13.legend(framealpha=0.55)  # Display legend
     ax13.set_xlabel('Time from start of blocking [days]')  # X-axis label
@@ -2647,9 +2716,9 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax21.plot(t, pm_mean2 + t * 0, c='gray')  # Plot the mean during no blocking
     ax21.fill_between(t, pm_mean2 + t * 0 + pm_sigma2, pm_mean2 + t * 0 - pm_sigma2, alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax21.fill_between(t, mean2[0] + sigma2[0], mean2[0] - sigma2[0], alpha=0.4, color=colors[0])  # Confidence interval for place1
-    ax21.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax21.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax21.set_ylim(0, 45)  # Set the Y-axis limits
+    ax21.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax21.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax21.set_ylim(0, 36)  # Set the Y-axis limits
     ax21.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax21.legend(framealpha=0.55)  # Display legend
     ax21.set_xticklabels([])
@@ -2660,9 +2729,9 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax22.plot(t, pm_mean2 + t * 0, c='gray')  # Plot the mean during no blocking
     ax22.fill_between(t, pm_mean2 + t * 0 + pm_sigma2, pm_mean2 + t * 0 - pm_sigma2, alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax22.fill_between(t, mean2[1] + sigma2[1], mean2[1] - sigma2[1], alpha=0.4, color=colors[1])  # Confidence interval for place1
-    ax22.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax22.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax22.set_ylim(0, 45)  # Set the Y-axis limits
+    ax22.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax22.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax22.set_ylim(0, 36)  # Set the Y-axis limits
     ax22.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax22.legend(framealpha=0.55)  # Display legend
     ax22.set_xticklabels([])
@@ -2673,9 +2742,9 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     ax23.plot(t, pm_mean2 + t * 0, c='gray')  # Plot the mean during no blocking
     ax23.fill_between(t, pm_mean2 + t * 0 + pm_sigma2, pm_mean2 + t * 0 - pm_sigma2, alpha=0.4, color='gray')  # Confidence interval for no blocking
     ax23.fill_between(t, mean2[2] + sigma2[2], mean2[2] - sigma2[2], alpha=0.4, color=colors[2])  # Confidence interval for place1
-    ax23.plot(t, t * 0 + 25, c='r', linestyle='--')  # Plot the EU annual mean limit value
-    ax23.set_ylabel('PM$_{{2.5}}$ [µg/m³]')  # Y-axis label
-    ax23.set_ylim(0, 45)  # Set the Y-axis limits
+    ax23.plot(t, t * 0 + EU_limVal, c='r', linestyle='--')  # Plot the EU annual mean limit value
+    ax23.set_ylabel('PM2.5 [µg/m³]')  # Y-axis label
+    ax23.set_ylim(0, 36)  # Set the Y-axis limits
     ax23.grid(True, axis='both', linestyle='--', alpha=0.6)  # Enable grid with style
     ax23.legend(framealpha=0.55)  # Display legend
     ax23.set_xlabel('Time from start of blocking [days]')  # X-axis label
@@ -2696,7 +2765,7 @@ def plot_pressure_mean(pressure_totdata_list1, pressure_totdata_list2, daystoplo
     elif save=="png":
             plt.savefig("Figures/Meanplot_pressure.png", dpi=400)    
     elif save == "Figure.png":
-        plt.savefig("Figures/Figure9.png", dpi=400)
+        plt.savefig("Figures/Figure8.png", dpi=400)
     else:
         plt.show()
 
@@ -2751,9 +2820,9 @@ def plot_blockingsdays_by_year(block_list, typ, save=False):
             
         if mean_pressure < 1020:
             blocking_strength[year][0] += duration  # weak
-        elif mean_pressure < 1025 and mean_pressure > 1020:
+        elif mean_pressure < 1026 and mean_pressure > 1020:
             blocking_strength[year][1] += duration  # medium
-        elif mean_pressure > 1025:
+        elif mean_pressure > 1026:
             blocking_strength[year][2] += duration  # strong    
 
         
@@ -3123,7 +3192,7 @@ def plot_blockings_by_year(block_list, lim1, lim2, Histogram=False, save=False):
     elif save=="png":
         plt.savefig("Figures/BlockingsPerYear.png", dpi=400)
     elif save == "Figure.png":
-        plt.savefig("Figures/Figure10.png", dpi=400)
+        plt.savefig("Figures/Figure9.png", dpi=400)
     else:
         plt.show()
         
@@ -3176,9 +3245,9 @@ def plot_blockingsdays_by_year(block_list, save=False):
             
         if mean_pressure < 1020:
             blocking_strength[year][0] += duration  # weak
-        elif mean_pressure < 1025 and mean_pressure > 1020:
+        elif mean_pressure < 1026 and mean_pressure > 1020:
             blocking_strength[year][1] += duration  # medium
-        elif mean_pressure > 1025:
+        elif mean_pressure > 1026:
             blocking_strength[year][2] += duration  # strong   
             
         # Wind direction
@@ -3430,6 +3499,6 @@ def plot_blockingsdays_by_year(block_list, save=False):
     elif save == "png":
              plt.savefig(f"Figures/blocking_days_per_year.png", dpi=400)
     elif save == "Figure.png":
-        plt.savefig("Figures/Figure11.png", dpi=400)
+        plt.savefig("Figures/Figure10.png", dpi=400)
     else:
         plt.show()

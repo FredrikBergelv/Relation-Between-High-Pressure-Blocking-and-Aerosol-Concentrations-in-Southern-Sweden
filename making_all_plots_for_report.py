@@ -17,21 +17,40 @@ import warnings
 warnings.simplefilter("ignore", category=RuntimeWarning)
 warnings.simplefilter("ignore", category=SyntaxWarning)
 warnings.simplefilter("ignore", category=UserWarning)
+warnings.simplefilter("ignore", category=FutureWarning)
 
 plt.close('all')
 
-info   = False         #<-------- CHANGE IF YOU WANT
-imsave = "Figure.png"  # Can be 'pdf', 'png', 'Figure.png' or False
+info   = True         #<-------- CHANGE IF YOU WANT
+imsave = False  # Can be 'pdf', 'png', 'Figure.png' or False
 
-press_lim   = 1014   # This is the pressure limit for classifying high pressure
-dur_lim     = 5      # Minimum number of days for blocking
-rain_lim    = 0.5    # Hourly max rain rate
-event_limit = 5      # Second rain filter for entire rain period
-daily_limit = 1      # Daily max rain rate (Ängelholm)
-mindatasets = 8      # Minimum allowed of datasets allowed when taking std and mean
-daystoplot  = 14     # How long periods should the plots display
-pm_coverege = 0.85   # How much PM2.5 coverage must the periods have
-timediff    = '5 hours' # This determines how far away two different events can be 
+press_lim    = 1014     # This is the pressure limit for classifying high pressure
+dur_lim      = 5        # Minimum number of days for blocking
+daily_limit  = 1        # Daily max rain rate (Ängelholm)
+event_limit  = 5        # Max 5 day rain rate (Ängelholm)
+mindatasets  = 8        # Minimum allowed of datasets allowed when taking std and mean
+daystoplot   = 14       # How long periods should the plots display
+pm_coverege  = 0.85     # How much PM2.5 coverage must the periods have
+mindata      = 8        # Minimum allowed of datasets allowed when taking std and mean
+limval       = 25       # This is the EU limit value for PM2.5
+timediff     ='5 hours' # This determines how far away two different events can be 
+
+
+# THE NEW PARAMTERS
+rain_lim_Malmö        = 0.4    # Hourly max rain rate
+event_limit_Malmö     = 5.5    # Second rain filter for entire rain period
+rain_lim_Vavihill     = 0.3    # Hourly max rain rate
+event_limit_Vavihill  = 6.4    # Second rain filter for entire rain period
+
+"""
+# THE OLD PARAMETERS
+rain_lim_Malmö        = 0.5    # Hourly max rain rate
+event_limit_Malmö     = 5      # Second rain filter for entire rain period
+rain_lim_Vavihill     = 0.5    # Hourly max rain rate
+event_limit_Vavihill  = 5      # Second rain filter for entire rain period
+"""
+
+
 
 
 start_time = time.time()
@@ -80,8 +99,8 @@ wind_data_Vavihill = csv.main['wind']["Hörby"]
 blocking_list_Vavihill = read.find_blocking(pressure_data, rain_data_Vavihill, 
                                        pressure_limit=press_lim, 
                                        duration_limit=dur_lim, 
-                                       rain_limit=rain_lim,
-                                       period_rain_limit=event_limit,
+                                       rain_limit=rain_lim_Vavihill,
+                                       period_rain_limit=event_limit_Vavihill,
                                        info=info)
 
 
@@ -92,8 +111,8 @@ wind_data_Malmö = csv.main['wind']["Malmö"]
 blocking_list_Malmö = read.find_blocking(pressure_data, rain_data_Malmö, 
                                        pressure_limit=press_lim, 
                                        duration_limit=dur_lim, 
-                                       rain_limit=rain_lim,
-                                       period_rain_limit=event_limit,
+                                       rain_limit=rain_lim_Malmö,
+                                       period_rain_limit=event_limit_Malmö,
                                        info=info)
 
 
@@ -101,7 +120,6 @@ blocking_list_Malmö, blocking_list_Vavihill = read.date_calibrate_blockinglists
                                                 blocking_list_Malmö, 
                                                 blocking_list_Vavihill, 
                                                 timediff, info=info)
-
 
 read.plot_period_both(PM_data_1=PM_data_Vavihill,
                     rain_data_1=rain_data_Vavihill,
@@ -168,7 +186,7 @@ read.plot_mean(totdata_list1=totdata_list_Vavihill, totdata_list2=totdata_list_M
                place1='Vavihill', place2='Malmö', 
                pm_mean1=pm_mean_Vavihill, pm_sigma1=pm_sigma_Vavihill,
                pm_mean2=pm_mean_Malmö, pm_sigma2=pm_sigma_Malmö, 
-               save=imsave)
+               EU_limVal=limval, save=imsave)
 
 read.plot_mean_after(pm_data1=PM_data_Vavihill, blocking_list1=blocking_list_Vavihill, 
                      pm_data2=PM_data_Malmö, blocking_list2=blocking_list_Malmö,
@@ -176,7 +194,7 @@ read.plot_mean_after(pm_data1=PM_data_Vavihill, blocking_list1=blocking_list_Vav
                      place1='Vavihill', place2='Malmö', 
                      pm_mean1=pm_mean_Vavihill, pm_sigma1=pm_sigma_Vavihill,
                      pm_mean2=pm_mean_Malmö, pm_sigma2=pm_sigma_Malmö, 
-                     save=imsave)
+                     EU_limVal=limval, save=imsave)
 
     
 if info: print(" \n ")
@@ -217,15 +235,17 @@ read.plot_dir_mean(dir_totdata_list1=dir_totdata_list_Vavihill,
                    daystoplot=daystoplot,
                    no_blocking_data1=dir_grey_area1,
                    no_blocking_data2=dir_grey_area2,
-                   minpoints=8,
-                   place1='Vavihill', place2='Malmö', save=imsave)
+                   minpoints=mindata,
+                   place1='Vavihill', place2='Malmö', 
+                   EU_limVal=limval, save=imsave)
 
 
 read.plot_pressure_mean(pressure_totdata_list1=pressure_totdata_list_Vavihill, 
                         pressure_totdata_list2=pressure_totdata_list_Malmö, 
                         daystoplot=daystoplot,  
-                        minpoints=8,
-                        place1='Vavihill', place2='Malmö', save=imsave,
+                        minpoints=mindata,
+                        place1='Vavihill', place2='Malmö', 
+                        EU_limVal=limval, save=imsave,
                         pm_mean1=pm_mean_Vavihill, pm_sigma1=pm_sigma_Vavihill,
                         pm_mean2=pm_mean_Malmö, pm_sigma2=pm_sigma_Malmö)
 
@@ -243,8 +263,9 @@ read.plot_seasonal_mean(seasonal_totdata_list1=seasonal_totdata_list_Vavihill,
                    daystoplot=daystoplot,
                    no_blocking_data1=seasonal_grey_area1,
                    no_blocking_data2=seasonal_grey_area2,
-                   minpoints=8,
-                   place1='Vavihill', place2='Malmö', save=imsave)
+                   minpoints=mindata,
+                   place1='Vavihill', place2='Malmö', 
+                   EU_limVal=limval, save=imsave)
 
 if not info: print('3. The mean plots are now done')
 

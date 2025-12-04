@@ -1,14 +1,14 @@
-# Analysis of PM₂.₅ Concentration During High-Pressure Blocking Events
+# Analysis of PM2.5 Concentration During High-Pressure Blocking Events
 
-This repository contains all scripts and data for my Bachelor's thesis in physics, which has now been turned into an article. The work investigates the relationship between PM₂.₅ concentrations and high-pressure blocking events using data from the Swedish Meteorological and Hydrological Institute (SMHI) and air quality measurements from both urban and rural sites in Skåne County, Sweden.
+This repository contains all scripts and data for my Bachelor's thesis in physics, which has now been turned into an article. The work investigates the relationship between PM2.5 concentrations and high-pressure blocking events using data from the Swedish Meteorological and Hydrological Institute (SMHI) and air quality measurements from both urban and rural sites in Skåne County, Sweden.
 
 ---
 
 ## Article Introduction
 
-It is common knowledge that the Earth’s increasing temperature has many side effects. One such effect is the increase in the frequency of extreme weather phenomena. One such phenomenon, which lacks extensive research, is high-pressure blocking events. A high-pressure blocking event is an anticyclone that covers an area for a prolonged period of time and often blocks other types of weather, hence the name. This results in clearer weather and more extreme temperatures. However, an anticyclone is also associated with lower air movement and wind, causing the air to remain stagnant. This can lead to the accumulation of aerosols, such as PM₂.₅, in the region.
+It is common knowledge that the Earth’s increasing temperature has many side effects. One such effect is the increase in the frequency of extreme weather phenomena. One such phenomenon, which lacks extensive research, is high-pressure blocking events. A high-pressure blocking event is an anticyclone that covers an area for a prolonged period of time and often blocks other types of weather, hence the name. This results in clearer weather and more extreme temperatures. However, an anticyclone is also associated with lower air movement and wind, causing the air to remain stagnant. This can lead to the accumulation of aerosols, such as PM2.5, in the region.
 
-To investigate the relationship between PM₂.₅ and high-pressure blocking, one must analyze periods of high-pressure blocking and examine the concentration of PM₂.₅ during these periods. The goal of this thesis is to analyze the concentration of PM₂.₅ during periods of high-pressure blocking by reviewing data from the Swedish Meteorological and Hydrological Institute (SMHI) and PM₂.₅ data from rural (Vavihill, Svalöv, Skåne County) and urban (Malmö, Skåne County) areas.
+To investigate the relationship between PM2.5 and high-pressure blocking, one must analyze periods of high-pressure blocking and examine the concentration of PM2.5 during these periods. The goal of this thesis is to analyze the concentration of PM2.5 during periods of high-pressure blocking by reviewing data from the Swedish Meteorological and Hydrological Institute (SMHI) and PM2.5 data from rural (Vavihill, Svalöv, Skåne County) and urban (Malmö, Skåne County) areas.
 
 ## Repository Contents
 
@@ -54,4 +54,4 @@ Fredrik Bergelv, Lund University
 
 If you use or reference the results of this work, please cite the following:
 
-**Bergelv, F. (2025).** Analysis of PM₂.₅ Concentration During High-Pressure Blocking Events [Python code]. GitHub. https://github.com/FredrikBergelv/Relation-Between-High-Pressure-Blocking-and-Aerosol-Concentrations-in-Southern-Sweden
+**Bergelv, F. (2025).** Analysis of PM2.5 Concentration During High-Pressure Blocking Events [Python code]. GitHub. https://github.com/FredrikBergelv/Relation-Between-High-Pressure-Blocking-and-Aerosol-Concentrations-in-Southern-Sweden

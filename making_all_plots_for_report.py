@@ -272,4 +272,3 @@ if not info: print('3. The mean plots are now done')
     
 if not info: print(f"Elapsed time: {time.time() - start_time:.0f} seconds")
 
-

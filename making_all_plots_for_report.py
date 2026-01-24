@@ -22,7 +22,7 @@ warnings.simplefilter("ignore", category=FutureWarning)
 plt.close('all')
 
 info   = True         #<-------- CHANGE IF YOU WANT
-imsave = False  # Can be 'pdf', 'png', 'Figure.png' or False
+imsave = False # Can be 'pdf', 'png', 'Figure.png' or False
 
 press_lim    = 1014     # This is the pressure limit for classifying high pressure
 dur_lim      = 5        # Minimum number of days for blocking
@@ -37,19 +37,10 @@ timediff     ='5 hours' # This determines how far away two different events can 
 
 
 # THE NEW PARAMTERS
-rain_lim_Malmö        = 0.4    # Hourly max rain rate
-event_limit_Malmö     = 5.5    # Second rain filter for entire rain period
-rain_lim_Vavihill     = 0.3    # Hourly max rain rate
-event_limit_Vavihill  = 6.4    # Second rain filter for entire rain period
-
-"""
-# THE OLD PARAMETERS
 rain_lim_Malmö        = 0.5    # Hourly max rain rate
-event_limit_Malmö     = 5      # Second rain filter for entire rain period
+event_limit_Malmö     = 5    # Second rain filter for entire rain period
 rain_lim_Vavihill     = 0.5    # Hourly max rain rate
-event_limit_Vavihill  = 5      # Second rain filter for entire rain period
-"""
-
+event_limit_Vavihill  = 5    # Second rain filter for entire rain period
 
 
 
@@ -66,9 +57,9 @@ blocking_list = read.find_blocking(csv.histogram_main['pressure'],
                                    csv.histogram_main['rain'],
                                    pressure_limit=press_lim, 
                                    duration_limit=dur_lim, 
-                                   rain_limit=daily_limit/24,
+                                   rain_limit=daily_limit/24, # This is avrege four 24 hours 
                                    period_rain_limit=event_limit,
-                                   wind_data=csv.histogram_main['wind']) # This is avrege four 24 hours 
+                                   wind_data=csv.histogram_main['wind'])
 
 
 read.plot_blockings_by_year(blocking_list, lim1=7, lim2=10, save=imsave)

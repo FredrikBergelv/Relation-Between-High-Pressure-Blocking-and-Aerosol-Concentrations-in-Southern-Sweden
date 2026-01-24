@@ -480,8 +480,8 @@ with their respectivly dates.
 """
 def date_calibrate_blockinglists(blocking1, blocking2, timediff, info):
     """ 
-    Takes two blcocking lists filled with pandas datatframe and one panda timediff
-    returns two filtered dataframe
+    Take two blocking lists (lists of pandas DataFrames)  
+    and synchronize them so matched events differ in duration by ≤ timediff.
     """
     bl1 = blocking1
     bl2 = blocking2
@@ -489,55 +489,106 @@ def date_calibrate_blockinglists(blocking1, blocking2, timediff, info):
     datelist_Malmö = pd.Series(index=range(len(bl2)), dtype='datetime64[ns]')
     datelist_Vavihill = pd.Series(index=range(len(bl1)), dtype='datetime64[ns]')
 
+    # Extract event start times
     for i, event in enumerate(bl2):
-        start = min(event['datetime'])  
-        datelist_Malmö[i] = pd.to_datetime(start)  
-        
+        datelist_Malmö[i] = pd.to_datetime(min(event['datetime']))  
     for i, event in enumerate(bl1):
-        start = min(event['datetime'])  
-        datelist_Vavihill[i] = pd.to_datetime(start)  
+        datelist_Vavihill[i] = pd.to_datetime(min(event['datetime']))  
 
-    # Define time window (24 hours)
     time_window = pd.Timedelta(timediff)
 
-    # Initialize sets to keep track of matched indices
     matched_malmo = set()
     matched_vavihill = set()
 
-    # For each Vavihill event, check for Malmö events within ±24 hours
+    # Match events within ± timediff
     for i_vav, date_vav in datelist_Vavihill.items():
         diffs = (datelist_Malmö - date_vav).abs()
         nearby = diffs <= time_window
         if nearby.any():
-            # There is at least one Malmö event within ±24 hours — mark both as matched
             matched_vavihill.add(i_vav)
             matched_malmo.update(datelist_Malmö[nearby].index)
 
-    # Now calculate unmatched indices
     all_malmo = set(datelist_Malmö.index)
     all_vavihill = set(datelist_Vavihill.index)
 
     unmatched_malmo = sorted(all_malmo - matched_malmo)
     unmatched_vavihill = sorted(all_vavihill - matched_vavihill)
 
-
-    # First: create copies to avoid modifying original lists accidentally
+    # Filter lists to matched events only
     bl1_filtered = [event for i, event in enumerate(bl1) if i not in unmatched_vavihill]
     bl2_filtered = [event for i, event in enumerate(bl2) if i not in unmatched_malmo]
 
-    # Now bl1_filtered and bl2_filtered contain only paired events!
+    # ---------------------------------------------------------------
+    #  OPTION D: Trim events so duration difference ≤ timediff
+    # ---------------------------------------------------------------
+    trimmed_bl1 = []
+    trimmed_bl2 = []
 
-    # Optional: if you want to overwrite original variables directly
-    blocking1 = bl1_filtered
-    blocking2 = bl2_filtered
-    
+    for ev1, ev2 in zip(bl1_filtered, bl2_filtered):
+
+        # Start/end for each event
+        t1_start, t1_end = min(ev1['datetime']), max(ev1['datetime'])
+        t2_start, t2_end = min(ev2['datetime']), max(ev2['datetime'])
+
+        d1 = t1_end - t1_start
+        d2 = t2_end - t2_start
+
+        # If within limit already → no trimming needed
+        if abs(d1 - d2) <= time_window:
+            trimmed_bl1.append(ev1)
+            trimmed_bl2.append(ev2)
+            continue
+
+        # Identify longer/shorter
+        if d1 > d2:
+            longer, shorter = ev1, ev2
+            longer_start, longer_end = t1_start, t1_end
+            shorter_start, shorter_end = t2_start, t2_end
+            longer_list = trimmed_bl1
+            shorter_list = trimmed_bl2
+        else:
+            longer, shorter = ev2, ev1
+            longer_start, longer_end = t2_start, t2_end
+            shorter_start, shorter_end = t1_start, t1_end
+            longer_list = trimmed_bl2
+            shorter_list = trimmed_bl1
+
+        # Target duration = shorter_duration + timediff
+        target_duration = (shorter_end - shorter_start) + time_window
+
+        # Trim the longer event symmetrically as much as possible
+        new_longer_start = longer_start
+        new_longer_end = new_longer_start + target_duration
+
+        # If that exceeds the original end, slide window back
+        if new_longer_end > longer_end:
+            new_longer_end = longer_end
+            new_longer_start = new_longer_end - target_duration
+
+        # Now cut the longer event
+        trimmed_longer = longer[(longer['datetime'] >= new_longer_start) &
+                                (longer['datetime'] <= new_longer_end)]
+        
+        # Save trimmed versions in correct list order
+        if d1 > d2:   # ev1 was longer
+            trimmed_bl1.append(trimmed_longer)
+            trimmed_bl2.append(shorter)
+        else:         # ev2 was longer
+            trimmed_bl1.append(shorter)
+            trimmed_bl2.append(trimmed_longer)
+
+    # Replace original variables
+    blocking1 = trimmed_bl1
+    blocking2 = trimmed_bl2
+
+    # Optional print
     if info:
-        num_events = len(bl1_filtered)
+        num_events = len(trimmed_bl1)
         if num_events > 0:
-            start_date = min([min(event['datetime']) for event in bl1_filtered]).strftime('%B %d, %Y')
-            end_date = max([max(event['datetime']) for event in bl1_filtered]).strftime('%B %d, %Y')
-            print(f"\nAfter applying the high-pressure blocking detection method to the data from Vavihill and Malmö for the entire period, a total of {num_events} high-pressure blocking events were identified between {start_date} and {end_date}.")
-    
+            start_date = min([min(event['datetime']) for event in trimmed_bl1]).strftime('%B %d, %Y')
+            end_date = max([max(event['datetime']) for event in trimmed_bl1]).strftime('%B %d, %Y')
+            print(f"\nAfter calibration and trimming, {num_events} matched high-pressure blocking events remain ({start_date} → {end_date}).")
+
     return blocking1, blocking2
 
 
@@ -2050,14 +2101,14 @@ def plot_dir_mean(dir_totdata_list1, dir_totdata_list2, daystoplot,
     tau23, slope23 = safe_mk(mean2[2])
     tau24, slope24 = safe_mk(mean2[3])
     
-    """
+    #"""
     # If we want max tau values
     vals = mean1[1]
-    imax = np.nanargmax(vals)      # index of highest value
+    imax = 24*9      # index 
     vals_cut = vals[:imax+1]
     tauu, slope = safe_mk(vals_cut)
     print(tauu, imax, vals_cut[-1])
-    """
+    #"""
 
     if info:
         first_nine_days = mean1[2][:9*24]

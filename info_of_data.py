@@ -16,7 +16,7 @@ import warnings
 
 
 # Assuming station is your DataFrame
-station = read.get_pm_data(csv.data["dailyrain"]["Tånga"])
+station = read.get_pm_data(csv.data["wind"]["Hörby"])
 
 
 print(f" Start date {station["datetime_start"][0]}")
@@ -38,5 +38,8 @@ print(f"Length with no NaN values: {length_val:.0f}")
 print(f"Fraction of non-NaN values: {100*fraction_non_nan:.0f}%")
 print("\n")
 
-print(f" {station["datetime_start"][0]} to {station["datetime_start"][len(station)-1]}")
+start = station["datetime_start"].iloc[0].date()
+end = station["datetime_start"].iloc[-1].date()
+
+print(f"{start} to {end}")
 
